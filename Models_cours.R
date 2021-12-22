@@ -4,7 +4,7 @@
 ##                                    ##
 ##------------------------------------##
 
-### Libraries ----
+# Libraries --------------------
 require("xts")
 #install.packages("CASdatasets", repos = "http://dutangc.perso.math.cnrs.fr/RRepository/pub/", type="source")
 library(CASdatasets)
@@ -15,23 +15,26 @@ library(xtable)
 library(mvabund)
 library(pscl)
 library(plotly)
+library(stats)
 
 
-### Data ----
+# Data --------------------
 data(freMTPLfreq)
 data(freMTPLsev)
 
-### Régression pour la fréquence ----
-summary(freMTPLfreq)
-
-
-# Catégorisation ----
+### Travail sur les variables ----
 freMTPLfreq$DriverAgeG <- cut(freMTPLfreq$DriverAge, c(17, 2:8*10, 100))
 freMTPLfreq$CarAgeG <- cut(freMTPLfreq$CarAge, c(-1, 0:1*5, 100))
 freMTPLfreq$LDensity <- log(freMTPLfreq$Density)
+freMTPLsev$LClaimAmount <- log(freMTPL$ClaimAmount)
+
+freMTPL <- merge(freMTPLfreq, freMTPLsev, by = "PolicyID", all =T)
 
 
-# Stats desc ----
+# Régression pour la fréquence ----------------
+summary(freMTPLfreq)
+
+### Stats desc ----
 # Car Age
 data_plot1 <- freMTPLfreq %>% 
   group_by(CarAge,ClaimNb) %>% 
@@ -100,15 +103,19 @@ plot(freMTPLfreq %>% group_by(Region) %>%
 
 
 
-# Modele poisson ----
+### Modele poisson ----
 fpois2 <- glm(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
               +Gas+Region+Density, offset=log(Exposure),
               family=poisson("log"), data=freMTPLfreq)
 summary(fpois2)
 #xtable(coef(summary(fpois2)), digits=3) 
 
+plot(fpois2)
+plot(fitted(fpois2), resid(fpois2), 
+     ylab="Residuals", xlab="fitted") 
 
-# Modele Poisson sur dispersée (quasi poisson) ----
+
+### Modele Poisson sur dispersée (quasi poisson) ----
 fqpois3 <- glm(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
                +Gas+Region+Density, offset=log(Exposure),
                family=quasipoisson("log"), data=freMTPLfreq)
@@ -116,7 +123,7 @@ summary(fqpois3)
 summary(fqpois3)$dispersion #phi
 
 
-# Modele binomiale negative ----
+### Modele binomiale negative ----
 # Première méthode : fixer theta hat = phi en faisant une regression linéaire
 phi <- 0.9864679
 fnb4 <- glm(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
@@ -131,7 +138,7 @@ fnb5 <- glm.nb(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
 summary(fnb5)
 
 
-# Zero inflaté ----
+### Zero inflaté ----
 fzip_logit <- zeroinfl(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
                +Gas+Region+Density+offset(log(Exposure)),
                data=freMTPLfreq, dist = "poisson", link = "logit")
@@ -141,3 +148,61 @@ fzip_probit <- zeroinfl(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
                        +Gas+Region+Density+offset(log(Exposure)),
                        data=freMTPLfreq, dist = "poisson", link = "probit")
 summary(fzip_probit)
+
+
+
+# Régression pour la severite ----------------
+freMTPL_filtered <- freMTPL %>% filter(ClaimAmount<=1125 | ClaimAmount>=1221)
+
+### Stats desc ----
+summary(freMTPL)
+summary(freMTPL_filtered)
+
+# Fonction de répartition empirique
+plot(ecdf(freMTPL_filtered$ClaimAmount), xlim = c(0, 10000))
+plot(ecdf(freMTPL_filtered$LClaimAmount), xlim = c(0, 15))
+
+# box plot ClaimAmount
+ggplot(freMTPL_filtered, aes(x="1", y=ClaimAmount)) + 
+  geom_boxplot()
+ggplot(freMTPL_filtered, aes(x="1", y=LClaimAmount)) + 
+  geom_boxplot()
+
+# Boxplot bivariée ClaimAmount x Autre variable
+ggplot(freMTPL_filtered, aes(x=as.factor(DriverAge), y=ClaimAmount, fill=as.factor(DriverAge))) + 
+  geom_boxplot(outlier.shape = NA) +
+  coord_cartesian(ylim = quantile(freMTPL_filtered$ClaimAmount, c(0.1, 0.9)))
+
+ggplot(freMTPL_filtered, aes(x=as.factor(Region), y=ClaimAmount)) + 
+  geom_boxplot(outlier.shape = NA) +
+  coord_cartesian(ylim = quantile(freMTPL_filtered$ClaimAmount, c(0.1, 0.9)))
+
+ggplot(freMTPL_filtered, aes(x=as.factor(CarAge), y=ClaimAmount)) + 
+  geom_boxplot(outlier.shape = NA) +
+  coord_cartesian(ylim = quantile(freMTPL_filtered$ClaimAmount, c(0.1, 0.9)))
+
+ggplot(freMTPL_filtered, aes(x=as.factor(Power), y=ClaimAmount)) + 
+  geom_boxplot(outlier.shape = NA) +
+  coord_cartesian(ylim = quantile(freMTPL_filtered$ClaimAmount, c(0.1, 0.9)))
+
+
+
+
+### Modele Gamma lien log ----
+# freMTPL <- freMTPL %>% 
+#   mutate(ClaimAmount = ifelse(is.na(ClaimAmount), 0, ClaimAmount)) 
+
+fgamma <- glm(ClaimAmount ~ DriverAgeG+LDensity, offset=log(Exposure),
+              family=Gamma("log"), data=freMTPL_filtered)
+summary(fgamma)
+
+plot(fitted(fgamma), resid(fgamma), 
+     ylab="Residuals", xlab="fitted",
+     title = "Gamma lien log") 
+
+### Modele Inverse gaussienne lien log ----
+fig_log <- glm(ClaimAmount ~ DriverAgeG+LDensity, offset=log(Exposure),
+              family=gaussian("log"), data=freMTPL)
+summary(fig_log)
+
+
