@@ -91,7 +91,7 @@ mean_variance <- function(data, var_group, var_nb, weight = F, var_expo = NULL){
        xlab = "mean", ylab = "variance")
   
   # Plot regression line
-  x0 <- seq(0.9*min(data_plot$m), 1.1*max(data_plot$m), length = 5)  ## prediction grid
+  x0 <- seq(0.9*min(data_plot$m), 1.1*max(data_plot$m), length = 20)  ## prediction grid
   y0 <- to_vec(for(x in x0) x + x^2 *coef)
   lines(x0, y0, col = "red")  
 }
@@ -132,7 +132,8 @@ amountvsnb <- function(x, add=FALSE, horiz=FALSE, main, ...)
 
 amountvsnb_grouped <- function(data, var_group, var_claim_amount, ...){
   data_plot <- data %>% rename(group = eval(var_group), amount = eval(var_claim_amount)) 
-  lev <- levels(data_plot$group)
+  data_plot <- data_plot %>% arrange(group) 
+  lev <- unique(data_plot$group)
   colors=c(RColorBrewer::brewer.pal(length(lev),"Set1"))
   title = paste0("agg./nb. per ", var_group)
   i = 1
