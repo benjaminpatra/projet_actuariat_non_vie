@@ -1,0 +1,95 @@
+---
+title: "01_Analyse des données"
+author: "E.Maucuer & B.PATRA"
+date: "12/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries}
+library(dplyr)
+library(plotly)
+library(ggplot2)
+```
+
+```{r load data}
+data_claims <- read.csv("./ENSAE-15MAPA/15MAPA-PG_2017_CLAIMS_YEAR0.csv")
+data <-  read.csv("./ENSAE-15MAPA/15MAPA-PG_2017_YEAR0.csv")
+source("02_plot_function.R")
+```
+
+```{r creation des bases}
+nb_claim <- data_claims %>% group_by(id_policy) %>% summarise(claim_nb = sum(claim_nb))
+#data_claims$Lclaim_amount <- log(data_claims$claim_amount)
+data$drv_age1G <- cut(data$drv_age1, c(17, 2:8*10, 100))
+
+
+data_freq <- left_join(data, nb_claim, by = "id_policy")
+data_freq <- data_freq %>% mutate(claim_nb = ifelse(is.na(claim_nb), 0, claim_nb))
+colnames(data_freq)
+
+data_tot <- merge(data_claims, data, by = "id_policy", all = T)
+data_claims <- merge(data_claims, data, by = "id_policy", all.x = T)
+```
+
+```{r premieres etudes des data}
+summary(data)
+summary(data_claims)
+```
+
+# 1- Etude de la frequence
+```{r plots frequence}
+table(data_freq$claim_nb)
+
+fun_plot(data_freq, "drv_age1", "claim_nb")
+fun_plot(data_freq, "drv_age_lic1", "claim_nb")
+fun_plot(data_freq, "vh_age", "claim_nb")
+fun_plot(data_freq, "vh_cyl", "claim_nb")
+fun_plot(data_freq, "vh_din", "claim_nb")
+fun_plot(data_freq, "vh_fuel", "claim_nb")
+fun_plot(data_freq, "vh_make", "claim_nb")
+fun_plot(data_freq, "vh_model", "claim_nb")
+fun_plot(data_freq, "vh_type", "claim_nb")
+fun_plot(data_freq, "vh_value", "claim_nb")
+fun_plot(data_freq, "vh_weight", "claim_nb")
+fun_plot(data_freq, "pol_bonus", "claim_nb")
+fun_plot(data_freq, "pol_payd", "claim_nb")
+```
+```{r plot mean var}
+mean_variance(data_freq, 'drv_age1', 'claim_nb')
+mean_variance(data_freq, 'vh_age', 'claim_nb')
+mean_variance(data_freq, 'vh_make', 'claim_nb')
+mean_variance(data_freq, 'drv_age_lic1', 'claim_nb')
+```
+
+# 2- Etude de la severite
+```{r plot severite}
+summary(data_claims$claim_amount) # il y a des valeurs négatives de claim_amount
+
+ggplot(data_claims, aes(x="1", y=claim_amount)) + 
+  geom_boxplot()
+
+ggplot(data_claims, aes(x="1", y=claim_amount)) + 
+  geom_boxplot() +
+  coord_cartesian(ylim = quantile(data_claims$claim_amount, c(0.1, 0.99)))
+
+plot(ecdf(data_claims$claim_amount), xlim = c(-1000, 10000)) 
+
+names(which(table(data_claims$claim_amount) > 3))
+```
+
+```{r plot severite 2}
+fun_boxplot(data_claims, "vh_age", "claim_amount")
+fun_boxplot(data_claims, "drv_age1", "claim_amount")
+fun_boxplot(data_claims, "vh_make", "claim_amount")
+```
+
+```{r plot severite 2}
+amountvsnb(data_claims$claim_amount)
+amountvsnb_grouped(data_claims, "drv_age1G", "claim_amount")
+amountvsnb_grouped(data_claims, "vh_fuel", "claim_amount")
+amountvsnb_grouped(data_claims, "vh_type", "claim_amount")
+```
