@@ -112,9 +112,12 @@ data_claims <- merge(data_claims %>% filter(claim_amount > 0),
 
 # Sauvergarde des bases ---------------------------------------------------
 
-saveRDS(data_freq, "data_freq_year0.rds")
-saveRDS(data_tot, "data_tot_year0.rds")
-saveRDS(data_claims,"data_claims_year0.rds")
+dir.create("./data", showWarnings = FALSE)
+
+
+saveRDS(data_freq, "data/data_freq_year0.rds")
+saveRDS(data_tot, "data/data_tot_year0.rds")
+saveRDS(data_claims,"data/data_claims_year0.rds")
 
 
 
