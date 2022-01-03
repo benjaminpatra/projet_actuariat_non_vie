@@ -16,12 +16,14 @@ population_dep <- read.xlsx("data/ensemble.xlsx", sheetIndex = 2, startRow = 8, 
 # Création d'une variable numéro du département ------------------------------
 
 data_policy <- data_policy %>% 
-  mutate(DEP = as.character(str_extract_all(pol_insee_code,"^\\d.")))
-
+  mutate(DEP = as.character(str_extract_all(pol_insee_code,"^\\d."))) 
 
 # Ajout de la variable densité de la population par département -----------
 
-data_policy <- data_policy %>% left_join(density_dep, by = "DEP")
+data_policy <- data_policy %>% 
+  left_join(density_dep, by = "DEP") %>% 
+  rename(densite = Densité,
+         departement = Département)
 
 
 # Variable catégorielle de pol_bonus --------------------------------------
@@ -31,23 +33,23 @@ data_policy$bonus <- ifelse(data_policy$pol_bonus < 1, "bonus", ifelse(data_poli
 
 # Création de découpages pour les variables continues ---------------------
 
-data_policy$drv_age1G1 <- cut(data_policy$drv_age1, c(17, 2:8*10, 100))
-data_policy$drv_age1G2 <- cut(data_policy$drv_age1, c(17, seq(from = 25, to = 80, by = 5),100))
-data_policy$drv_age1G3 <- cut(data_policy$drv_age1, c(17, 25, 45,65,80,100))
+data_policy$drv_age1_G1 <- cut(data_policy$drv_age1, c(17, 2:8*10, 100))
+data_policy$drv_age1_G2 <- cut(data_policy$drv_age1, c(17, seq(from = 25, to = 80, by = 5),100))
+data_policy$drv_age1_G3 <- cut(data_policy$drv_age1, c(17, 25, 45,65,80,100))
 
-data_policy$drv_age_lic1G <- cut(data_policy$drv_age_lic1,c(-1,3,5,100))
+data_policy$drv_age_lic1_G <- cut(data_policy$drv_age_lic1,c(-1,3,5,100))
 
-data_policy$drv_age2G1 <- cut(data_policy$drv_age2, c(17, 2:8*10, 100))
-data_policy$drv_age2G2 <- cut(data_policy$drv_age2, c(17, seq(from = 25, to = 80, by = 5),100))
-data_policy$drv_age2G3 <- cut(data_policy$drv_age2, c(17, 25, 45,65,80,100))
+data_policy$drv_age2_G1 <- cut(data_policy$drv_age2, c(17, 2:8*10, 100))
+data_policy$drv_age2_G2 <- cut(data_policy$drv_age2, c(17, seq(from = 25, to = 80, by = 5),100))
+data_policy$drv_age2_G3 <- cut(data_policy$drv_age2, c(17, 25, 45,65,80,100))
 
-data_policy$drv_age_lic2G <- cut(data_policy$drv_age_lic2,c(-1,3,5,100))
+data_policy$drv_age_lic2_G <- cut(data_policy$drv_age_lic2,c(-1,3,5,100))
 
-data_policy$vh_age_G <- cut(data_policy$vh_age,c(-1, 0:1*5, 100))
+data_policy$vh_age_G1 <- cut(data_policy$vh_age,c(-1, 0:1*5, 100))
 data_policy$vh_age_G2 <- cut(data_policy$vh_age,c(-1,10,20,100))
 data_policy$vh_age_G3 <- cut(data_policy$vh_age,c(-1,0,1,2,3,4,5,6,7,8,9,10,100))
 
-data_policy$vh_value_G <- cut(data_policy$vh_value,c(seq(from = 0, to = 100000, by = 10000),155498))
+data_policy$vh_value_G1 <- cut(data_policy$vh_value,c(seq(from = 0, to = 100000, by = 10000),155498))
 data_policy$vh_value_G2 <- cut(data_policy$vh_value,c(seq(from = 0, to = 100000, by = 50000),155498 +1))
 data_policy$vh_value_G3 <- cut(data_policy$vh_value,c(-1,20000,70000,155498+1))
 
@@ -69,7 +71,7 @@ luxe <- c("BENTLEY", "JAGUAR", "LAND ROVER", "LEXUS", "ROVER")
 europe <- c("OPEL", "SAAB", "SEAT", "VOLKSWAGEN", "VOLVO","SKODA","ALFA ROMEO","LANCIA")
 RENAULT <-c("RENAULT","NISSAN")
 
-data_policy$vh_makeG <- ifelse(data_policy$vh_make %in% autre, "autre",
+data_policy$vh_make_G <- ifelse(data_policy$vh_make %in% autre, "autre",
                                ifelse(data_policy$vh_make %in% allemande, "allemande",
                                       ifelse(data_policy$vh_make %in% asian, "asian",
                                              ifelse(data_policy$vh_make %in% sport, "sport",
@@ -82,7 +84,7 @@ data_policy$vh_makeG <- ifelse(data_policy$vh_make %in% autre, "autre",
 
 # Création du log des variables -------------------------------------------
 
-data_policy$LDensité <- log(data_policy$Densité)
+data_policy$Ldensite <- log(data_policy$densite)
 data_policy$Lvh_value <- log(data_policy$vh_value)
 data_policy$Lvh_weight <- log(data_policy$vh_weight)
 data_policy$Lvh_cyl <- log(data_policy$vh_cyl)
