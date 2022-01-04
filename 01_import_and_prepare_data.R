@@ -54,6 +54,14 @@ data_policy$vh_value_G2 <- cut(data_policy$vh_value,c(seq(from = 0, to = 100000,
 data_policy$vh_value_G3 <- cut(data_policy$vh_value,c(-1,20000,70000,155498+1))
 
 
+# Création d'une variables risk_class -------------------------------------
+
+data_policy$risk_class <- (data_policy$vh_din*0.736)*100/ (data_policy$vh_weight + 75)
+data_policy$risk_class_G  <- cut(data_policy$risk_class, 
+                                 breaks=c(quantile(data_policy$risk_class, probs = seq(0, 1, by = 0.20))),labels = 1:5)
+
+data_policy$vh_cyl_G <- cut(data_policy$vh_cyl,c(-1,1500,Inf), labels = 1:2)
+
 # Création d'une variable regroupant les marques de véhicules --------------
 
 autre <- c("ACL", "APAL", "ARO", "DATSUN", "EBRO", "FSO", "GME", "IVECO", "LADA VAZ", "MORRIS",
@@ -125,6 +133,5 @@ saveRDS(data_claims,"data/data_claims_year0.rds")
 
 #round(prop.table(table(data_freq$drv_age1G3, data_freq$claim_nb, useNA = 'ifany'), 1),3)
 #round(prop.table(table(data_freq$vh_makeG, data_freq$claim_nb, useNA = 'ifany'), 1),3)
-
 
 
