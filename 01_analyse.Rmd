@@ -3,10 +3,11 @@ title: "01_Analyse des données"
 author: "E.Maucuer & B.PATRA"
 date: "12/24/2021"
 output: html_document
+fig_width: 6 
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, warning = F, message = F)
 ```
 
 ```{r libraries}
@@ -16,58 +17,177 @@ library(ggplot2)
 ```
 
 ```{r load data}
-data_claims <- read.csv("./ENSAE-15MAPA/15MAPA-PG_2017_CLAIMS_YEAR0.csv")
-data <-  read.csv("./ENSAE-15MAPA/15MAPA-PG_2017_YEAR0.csv")
+data_claims <- readRDS("../data/data_claims_year0.rds")
+data_freq <- readRDS("../data/data_freq_year0.rds")
+data_tot <- readRDS("../data/data_tot_year0.rds")
 source("02_plot_function.R")
 ```
 
-```{r creation des bases}
-nb_claim <- data_claims %>% group_by(id_policy) %>% summarise(claim_nb = sum(claim_nb))
-#data_claims$Lclaim_amount <- log(data_claims$claim_amount)
-data$drv_age1G <- cut(data$drv_age1, c(17, 2:8*10, 100))
 
-
-data_freq <- left_join(data, nb_claim, by = "id_policy")
-data_freq <- data_freq %>% mutate(claim_nb = ifelse(is.na(claim_nb), 0, claim_nb))
-colnames(data_freq)
-
-data_tot <- merge(data_claims, data, by = "id_policy", all = T)
-data_claims <- merge(data_claims, data, by = "id_policy", all.x = T)
-```
-
-```{r premieres etudes des data}
-summary(data)
+```{r premieres etudes des data, echo = T}
+summary(data_freq)
 summary(data_claims)
 ```
 
-# 1- Etude de la frequence
-```{r plots frequence}
+# 1- Etude de la frequence 
+```{r tab frequence}
 table(data_freq$claim_nb)
+plot_ly(data_freq %>% group_by(claim_nb) %>% summarize(count = n())) %>%
+  add_trace(x= ~claim_nb, y= ~count, type = 'bar', color = ~as.factor(claim_nb), colors = "Reds")
 
+```
+
+## a- Barplots {.tabset}
+### drv_age1
+```{r plot fre drv_age1}
 fun_plot(data_freq, "drv_age1", "claim_nb")
+```
+### drv_age1_G1
+```{r plot fre drv_age1_G1}
+fun_plot(data_freq, "drv_age1_G1", "claim_nb")
+```
+### drv_age1_G2
+```{r plot fre drv_age1_G2}
+fun_plot(data_freq, "drv_age1_G2", "claim_nb")
+```
+### drv_age1_G3
+```{r plot fre drv_age1_G3}
+fun_plot(data_freq, "drv_age1_G3", "claim_nb")
+```
+
+### drv_age2
+```{r plot fre drv_age2}
+fun_plot(data_freq, "drv_age2", "claim_nb")
+```
+### drv_age2_G1
+```{r plot fre drv_age2_G1}
+fun_plot(data_freq, "drv_age2_G1", "claim_nb")
+```
+### drv_age2_G2
+```{r plot fre drv_age2_G2}
+fun_plot(data_freq, "drv_age2_G2", "claim_nb")
+```
+### drv_age2_G3
+```{r plot fre drv_age2_G3}
+fun_plot(data_freq, "drv_age2_G3", "claim_nb")
+```
+
+### drv_age_lic1
+```{r plot fre drv_age_lic1}
 fun_plot(data_freq, "drv_age_lic1", "claim_nb")
+```
+### drv_age_lic1_G
+```{r plot fre drv_age_lic1_G}
+fun_plot(data_freq, "drv_age_lic1_G", "claim_nb")
+```
+
+### drv_age_lic2
+```{r plot fre drv_age_lic2}
+fun_plot(data_freq, "drv_age_lic2", "claim_nb")
+```
+### drv_age_lic2_G
+```{r plot fre drv_age_lic2_G}
+fun_plot(data_freq, "drv_age_lic2_G", "claim_nb")
+```
+
+### vh_age
+```{r plot fre vh_age"}
 fun_plot(data_freq, "vh_age", "claim_nb")
+```
+### vh_age_G1
+```{r plot fre vh_age_G1}
+fun_plot(data_freq, "vh_age_G1", "claim_nb")
+```
+### vh_age_G2
+```{r plot fre vh_age_G2}
+fun_plot(data_freq, "vh_age_G2", "claim_nb")
+```
+### vh_age_G3
+```{r plot fre vh_ageG3}
+fun_plot(data_freq, "vh_age_G3", "claim_nb")
+```
+
+### vh_cyl
+```{r plot fre vh_cyl}
 fun_plot(data_freq, "vh_cyl", "claim_nb")
+```
+### vh_din
+```{r plot fre vh_din}
 fun_plot(data_freq, "vh_din", "claim_nb")
+```
+### vh_fuel
+```{r plot fre vh_fuel}
 fun_plot(data_freq, "vh_fuel", "claim_nb")
+```
+
+### vh_make
+```{r plot fre vh_make}
 fun_plot(data_freq, "vh_make", "claim_nb")
+```
+### vh_make_G
+```{r plot fre vh_make_G"}
+fun_plot(data_freq, "vh_make_G", "claim_nb")
+```
+
+### vh_model
+```{r plot fre vh_model}
 fun_plot(data_freq, "vh_model", "claim_nb")
+```
+### vh_type
+```{r plot fre vh_type}
 fun_plot(data_freq, "vh_type", "claim_nb")
+```
+
+### vh_value
+```{r plot fre vh_value}
 fun_plot(data_freq, "vh_value", "claim_nb")
+```
+### vh_value_G1
+```{r plot fre vh_value_G1}
+fun_plot(data_freq, "vh_value_G1", "claim_nb")
+```
+### vh_value_G2
+```{r plot fre vh_value_G2}
+fun_plot(data_freq, "vh_value_G2", "claim_nb")
+```
+### vh_value_G3
+```{r plot fre vh_value_G3}
+fun_plot(data_freq, "vh_value_G3", "claim_nb")
+```
+
+### vh_weight
+```{r plot fre vh_weight}
 fun_plot(data_freq, "vh_weight", "claim_nb")
+```
+
+### pol_bonus
+```{r plot fre pol_bonus}
 fun_plot(data_freq, "pol_bonus", "claim_nb")
+```
+### bonus
+```{r plot fre bonus}
+fun_plot(data_freq, "bonus", "claim_nb")
+```
+
+### pol_payd
+```{r plot fre pol_payd}
 fun_plot(data_freq, "pol_payd", "claim_nb")
 ```
+
+## b- Plots mean vs var
 ```{r plot mean var}
 mean_variance(data_freq, 'drv_age1', 'claim_nb')
+mean_variance(data_freq, 'drv_age_lic1', 'claim_nb')
+mean_variance(data_freq, 'drv_age2', 'claim_nb')
 mean_variance(data_freq, 'vh_age', 'claim_nb')
 mean_variance(data_freq, 'vh_make', 'claim_nb')
-mean_variance(data_freq, 'drv_age_lic1', 'claim_nb')
+mean_variance(data_freq, 'vh_din', 'claim_nb')
+mean_variance(data_freq, 'vh_cyl', 'claim_nb')
 ```
 
 # 2- Etude de la severite
 ```{r plot severite}
-summary(data_claims$claim_amount) # il y a des valeurs négatives de claim_amount
+summary(data_claims$claim_amount) 
 
 ggplot(data_claims, aes(x="1", y=claim_amount)) + 
   geom_boxplot()
@@ -76,20 +196,26 @@ ggplot(data_claims, aes(x="1", y=claim_amount)) +
   geom_boxplot() +
   coord_cartesian(ylim = quantile(data_claims$claim_amount, c(0.1, 0.99)))
 
-plot(ecdf(data_claims$claim_amount), xlim = c(-1000, 10000)) 
+plot(ecdf(data_claims$claim_amount), xlim = c(0, 5000)) 
+plot(ecdf(data_claims$Lclaim_amount), xlim = c(0, 50)) 
 
 names(which(table(data_claims$claim_amount) > 3))
 ```
 
 ```{r plot severite 2}
-fun_boxplot(data_claims, "vh_age", "claim_amount")
-fun_boxplot(data_claims, "drv_age1", "claim_amount")
-fun_boxplot(data_claims, "vh_make", "claim_amount")
+fun_boxplot(data_claims, "drv_age1_G1", "claim_amount")
+fun_boxplot(data_claims, "drv_age1_G2", "claim_amount")
+fun_boxplot(data_claims, "vh_age_G1", "claim_amount")
+fun_boxplot(data_claims, "vh_age_G2", "claim_amount")
+fun_boxplot(data_claims, "vh_value_G1", "claim_amount")
+fun_boxplot(data_claims, "vh_value_G2", "claim_amount")
+fun_boxplot(data_claims, "vh_make_G", "claim_amount")
 ```
 
-```{r plot severite 2}
+```{r plot severite 3}
 amountvsnb(data_claims$claim_amount)
-amountvsnb_grouped(data_claims, "drv_age1G", "claim_amount")
+amountvsnb_grouped(data_claims, "drv_age1_G1", "claim_amount")
+amountvsnb_grouped(data_claims, "drv_age_lic1_G", "claim_amount")
 amountvsnb_grouped(data_claims, "vh_fuel", "claim_amount")
-amountvsnb_grouped(data_claims, "vh_type", "claim_amount")
+amountvsnb_grouped(data_claims, "vh_value_G1", "claim_amount")
 ```
