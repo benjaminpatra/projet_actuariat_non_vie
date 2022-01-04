@@ -3,6 +3,7 @@ title: "01_Analyse des données"
 author: "E.Maucuer & B.PATRA"
 date: "12/24/2021"
 output: html_document
+fig_width: 6 
 ---
 
 ```{r setup, include=FALSE}
@@ -31,174 +32,146 @@ summary(data_claims)
 # 1- Etude de la frequence 
 ```{r tab frequence}
 table(data_freq$claim_nb)
+plot_ly(data_freq %>% group_by(claim_nb) %>% summarize(count = n())) %>%
+  add_trace(x= ~claim_nb, y= ~count, type = 'bar', color = ~as.factor(claim_nb), colors = "Reds")
+
 ```
 
 ## a- Barplots {.tabset}
 ### drv_age1
-```{r plot fre drv_age1, fig.show = "hold", out.width="50%"}
+```{r plot fre drv_age1}
 fun_plot(data_freq, "drv_age1", "claim_nb")
-fun_plot(data_freq, "drv_age1", "claim_nb", percent = T)
 ```
 ### drv_age1_G1
-```{r plot fre drv_age1_G1, fig.show = "hold", out.width="50%"}
+```{r plot fre drv_age1_G1}
 fun_plot(data_freq, "drv_age1_G1", "claim_nb")
-fun_plot(data_freq, "drv_age1_G1", "claim_nb", percent = T)
 ```
 ### drv_age1_G2
-```{r plot fre drv_age1_G2, fig.show = "hold", out.width="50%"}
+```{r plot fre drv_age1_G2}
 fun_plot(data_freq, "drv_age1_G2", "claim_nb")
-fun_plot(data_freq, "drv_age1_G2", "claim_nb", percent = T)
 ```
 ### drv_age1_G3
-```{r plot fre drv_age1_G3, fig.show = "hold", out.width="50%"}
+```{r plot fre drv_age1_G3}
 fun_plot(data_freq, "drv_age1_G3", "claim_nb")
-fun_plot(data_freq, "drv_age1_G3", "claim_nb", percent = T)
 ```
 
 ### drv_age2
-```{r plot fre drv_age2, fig.show = "hold", out.width="50%"}
+```{r plot fre drv_age2}
 fun_plot(data_freq, "drv_age2", "claim_nb")
-fun_plot(data_freq, "drv_age2", "claim_nb", percent = T)
 ```
 ### drv_age2_G1
-```{r plot fre drv_age2_G1, fig.show = "hold", out.width="50%"}
+```{r plot fre drv_age2_G1}
 fun_plot(data_freq, "drv_age2_G1", "claim_nb")
-fun_plot(data_freq, "drv_age2_G1", "claim_nb", percent = T)
 ```
 ### drv_age2_G2
-```{r plot fre drv_age2_G2, fig.show = "hold", out.width="50%"}
+```{r plot fre drv_age2_G2}
 fun_plot(data_freq, "drv_age2_G2", "claim_nb")
-fun_plot(data_freq, "drv_age2_G2", "claim_nb", percent = T)
 ```
 ### drv_age2_G3
-```{r plot fre drv_age2_G3, fig.show = "hold", out.width="50%"}
+```{r plot fre drv_age2_G3}
 fun_plot(data_freq, "drv_age2_G3", "claim_nb")
-fun_plot(data_freq, "drv_age2_G3", "claim_nb", percent = T)
 ```
 
 ### drv_age_lic1
-```{r plot fre drv_age_lic1, fig.show = "hold", out.width="50%"}
+```{r plot fre drv_age_lic1}
 fun_plot(data_freq, "drv_age_lic1", "claim_nb")
-fun_plot(data_freq, "drv_age_lic1", "claim_nb", percent = T)
 ```
 ### drv_age_lic1_G
-```{r plot fre drv_age_lic1_G, fig.show = "hold", out.width="50%"}
+```{r plot fre drv_age_lic1_G}
 fun_plot(data_freq, "drv_age_lic1_G", "claim_nb")
-fun_plot(data_freq, "drv_age_lic1_G", "claim_nb", percent = T)
 ```
 
 ### drv_age_lic2
-```{r plot fre drv_age_lic2, fig.show = "hold", out.width="50%"}
+```{r plot fre drv_age_lic2}
 fun_plot(data_freq, "drv_age_lic2", "claim_nb")
-fun_plot(data_freq, "drv_age_lic2", "claim_nb", percent = T)
 ```
 ### drv_age_lic2_G
-```{r plot fre drv_age_lic2_G, fig.show = "hold", out.width="50%"}
+```{r plot fre drv_age_lic2_G}
 fun_plot(data_freq, "drv_age_lic2_G", "claim_nb")
-fun_plot(data_freq, "drv_age_lic2_G", "claim_nb", percent = T)
 ```
 
 ### vh_age
-```{r plot fre vh_age, fig.show = "hold", out.width="50%"}
+```{r plot fre vh_age"}
 fun_plot(data_freq, "vh_age", "claim_nb")
-fun_plot(data_freq, "vh_age", "claim_nb", percent = T)
 ```
 ### vh_age_G1
-```{r plot fre vh_age_G1, fig.show = "hold", out.width="50%"}
+```{r plot fre vh_age_G1}
 fun_plot(data_freq, "vh_age_G1", "claim_nb")
-fun_plot(data_freq, "vh_age_G1", "claim_nb", percent = T)
 ```
 ### vh_age_G2
-```{r plot fre vh_age_G2, fig.show = "hold", out.width="50%"}
+```{r plot fre vh_age_G2}
 fun_plot(data_freq, "vh_age_G2", "claim_nb")
-fun_plot(data_freq, "vh_age_G2", "claim_nb", percent = T)
 ```
 ### vh_age_G3
-```{r plot fre vh_ageG3, fig.show = "hold", out.width="50%"}
+```{r plot fre vh_ageG3}
 fun_plot(data_freq, "vh_age_G3", "claim_nb")
-fun_plot(data_freq, "vh_age_G3", "claim_nb", percent = T)
 ```
 
 ### vh_cyl
-```{r plot fre vh_cyl, fig.show = "hold", out.width="50%"}
+```{r plot fre vh_cyl}
 fun_plot(data_freq, "vh_cyl", "claim_nb")
-fun_plot(data_freq, "vh_cyl", "claim_nb", percent = T)
 ```
 ### vh_din
-```{r plot fre vh_din, fig.show = "hold", out.width="50%"}
+```{r plot fre vh_din}
 fun_plot(data_freq, "vh_din", "claim_nb")
-fun_plot(data_freq, "vh_din", "claim_nb", percent = T)
 ```
 ### vh_fuel
-```{r plot fre vh_fuel, fig.show = "hold", out.width="50%"}
+```{r plot fre vh_fuel}
 fun_plot(data_freq, "vh_fuel", "claim_nb")
-fun_plot(data_freq, "vh_fuel", "claim_nb", percent = T)
 ```
 
 ### vh_make
-```{r plot fre vh_make, fig.show = "hold", out.width="50%"}
+```{r plot fre vh_make}
 fun_plot(data_freq, "vh_make", "claim_nb")
-fun_plot(data_freq, "vh_make", "claim_nb", percent = T)
 ```
 ### vh_make_G
-```{r plot fre vh_make_G, fig.show = "hold", out.width="50%"}
+```{r plot fre vh_make_G"}
 fun_plot(data_freq, "vh_make_G", "claim_nb")
-fun_plot(data_freq, "vh_make_G", "claim_nb", percent = T)
 ```
 
 ### vh_model
-```{r plot fre vh_model, fig.show = "hold", out.width="50%"}
+```{r plot fre vh_model}
 fun_plot(data_freq, "vh_model", "claim_nb")
-fun_plot(data_freq, "vh_model", "claim_nb", percent = T)
 ```
 ### vh_type
-```{r plot fre vh_type, fig.show = "hold", out.width="50%"}
+```{r plot fre vh_type}
 fun_plot(data_freq, "vh_type", "claim_nb")
-fun_plot(data_freq, "vh_type", "claim_nb", percent = T)
 ```
 
 ### vh_value
-```{r plot fre vh_value, fig.show = "hold", out.width="50%"}
+```{r plot fre vh_value}
 fun_plot(data_freq, "vh_value", "claim_nb")
-fun_plot(data_freq, "vh_value", "claim_nb", percent = T)
 ```
 ### vh_value_G1
-```{r plot fre vh_value_G1, fig.show = "hold", out.width="50%"}
+```{r plot fre vh_value_G1}
 fun_plot(data_freq, "vh_value_G1", "claim_nb")
-fun_plot(data_freq, "vh_value_G1", "claim_nb", percent = T)
 ```
 ### vh_value_G2
-```{r plot fre vh_value_G2, fig.show = "hold", out.width="50%"}
+```{r plot fre vh_value_G2}
 fun_plot(data_freq, "vh_value_G2", "claim_nb")
-fun_plot(data_freq, "vh_value_G2", "claim_nb", percent = T)
 ```
 ### vh_value_G3
-```{r plot fre vh_value_G3, fig.show = "hold", out.width="50%"}
+```{r plot fre vh_value_G3}
 fun_plot(data_freq, "vh_value_G3", "claim_nb")
-fun_plot(data_freq, "vh_value_G3", "claim_nb", percent = T)
 ```
 
 ### vh_weight
-```{r plot fre vh_weight, fig.show = "hold", out.width="50%"}
+```{r plot fre vh_weight}
 fun_plot(data_freq, "vh_weight", "claim_nb")
-fun_plot(data_freq, "vh_weight", "claim_nb", percent = T)
 ```
 
 ### pol_bonus
-```{r plot fre pol_bonus, fig.show = "hold", out.width="50%"}
+```{r plot fre pol_bonus}
 fun_plot(data_freq, "pol_bonus", "claim_nb")
-fun_plot(data_freq, "pol_bonus", "claim_nb", percent = T)
 ```
 ### bonus
-```{r plot fre bonus, fig.show = "hold", out.width="50%"}
+```{r plot fre bonus}
 fun_plot(data_freq, "bonus", "claim_nb")
-fun_plot(data_freq, "bonus", "claim_nb", percent = T)
 ```
 
 ### pol_payd
-```{r plot fre pol_payd, fig.show = "hold", out.width="50%"}
+```{r plot fre pol_payd}
 fun_plot(data_freq, "pol_payd", "claim_nb")
-fun_plot(data_freq, "pol_payd", "claim_nb", percent = T)
 ```
 
 ## b- Plots mean vs var
