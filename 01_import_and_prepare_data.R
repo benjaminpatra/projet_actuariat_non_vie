@@ -12,11 +12,17 @@ density_dep <- read.xlsx("data/FPORSOC21-F41.xlsx", sheetIndex = 3, endRow = 104
 
 population_dep <- read.xlsx("data/ensemble.xlsx", sheetIndex = 2, startRow = 8, header = TRUE, colIndex = c(3,4,8,9))
 
+reg_dep <- read_csv("data/reg_dep.csv")
 
 # Création d'une variable numéro du département ------------------------------
 
 data_policy <- data_policy %>% 
   mutate(DEP = as.character(str_extract_all(pol_insee_code,"^\\d."))) 
+
+
+# Ajout de la variable région ---------------------------------------------
+
+data_policy <- data_policy %>% left_join(reg_dep, by = "DEP")
 
 # Ajout de la variable densité de la population par département -----------
 
@@ -51,7 +57,7 @@ data_policy$vh_age_G3 <- cut(data_policy$vh_age,c(-1,0,1,2,3,4,5,6,7,8,9,10,100)
 
 data_policy$vh_value_G1 <- cut(data_policy$vh_value,c(seq(from = 0, to = 100000, by = 10000),155498))
 data_policy$vh_value_G2 <- cut(data_policy$vh_value,c(seq(from = 0, to = 100000, by = 50000),155498 +1))
-data_policy$vh_value_G3 <- cut(data_policy$vh_value,c(-1,20000,70000,155498+1))
+data_policy$vh_value_G3 <- cut(data_policy$vh_value,c(seq(from = 0, to = 50000, by = 10000,155498+1)))
 
 
 # Création d'une variables risk_class -------------------------------------
