@@ -57,7 +57,7 @@ data_policy$vh_age_G3 <- cut(data_policy$vh_age,c(-1,0,1,2,3,4,5,6,7,8,9,10,100)
 
 data_policy$vh_value_G1 <- cut(data_policy$vh_value,c(seq(from = 0, to = 100000, by = 10000),155498))
 data_policy$vh_value_G2 <- cut(data_policy$vh_value,c(seq(from = 0, to = 100000, by = 50000),155498 +1))
-data_policy$vh_value_G3 <- cut(data_policy$vh_value,c(seq(from = 0, to = 50000, by = 10000,155498+1)))
+data_policy$vh_value_G3 <- cut(data_policy$vh_value,c(seq(from = 0, to = 50000, by = 10000),155498+1))
 
 
 # Création d'une variables risk_class -------------------------------------
