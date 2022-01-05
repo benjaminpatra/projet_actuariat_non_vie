@@ -4,11 +4,12 @@ library(MASS)
 library(tidyverse)
 library(pscl)
 library(corrplot)
-source("./codes/02_plot_function.R")
+#source("./codes/02_plot_function.R")
+source("02_plot_function.R")
 
 # Import data -------------------------------------------------------------
 
-data_claims_year0 <- readRDS("data/data_claims_year0.rds")
+data_claims_ecrete_year0 <- readRDS("data/data_claims_ecrete_year0.rds")
 data_freq_year0 <-readRDS("data/data_freq_year0.rds")
 
 
@@ -149,4 +150,48 @@ summary(glmreg_AIC)
 "vh_age"           "vh_age_G1"        "vh_age_G2"        "vh_age_G3"        "vh_cyl"           "vh_cyl_G"         "vh_din"           "vh_fuel"         
 "vh_make"          "vh_make_G"        "vh_model"         "vh_sale_begin"    "vh_sale_end"      "vh_speed"         "vh_type"          "vh_value"        
 "vh_value_G1"      "vh_value_G2"      "vh_weight"     
+
+
+# Modèle pour la sévérité -------------------------------------------------
+
+fgamma <- glm(claim_amount_ecrete ~ drv_age1 +Ldensite,
+              family=Gamma("log"), data=data_claims_ecrete_year0)
+summary(fgamma)
+plotgroupresiduals(fgamma, m=1, trim = F) #, trim = F, m =1
+
+
+fgamma2 <- glm(claim_amount_ecrete ~ drv_age1+
+               pol_coverage+
+               pol_pay_freq+
+               vh_age_G2+
+               vh_value_G3,
+              family=Gamma("log"), data=data_claims_ecrete_year0)
+summary(fgamma2)
+
+#On supprime bonus et vh_make_G 
+# risk_class_G
+#drv_age2 vh_cyl pol_payd densite vh_fuel
+
+f_loggamma <- glm(log_claim_amount_ecrete ~ drv_age1+
+                 pol_coverage+
+                 pol_pay_freq+
+                 vh_age_G2+
+                 vh_value_G3,
+               family=Gamma("identity"), data=data_claims_ecrete_year0)
+summary(f_loggamma)
+
+### Modele Inverse gaussienne lien log ----
+
+fig_log <- glm(claim_amount_ecrete ~ drv_age1+
+                 pol_coverage+
+                 pol_pay_freq+
+                 vh_age_G2+
+                 vh_value_G3
+                 ,
+               family=inverse.gaussian("log"), data=data_claims_ecrete_year0, maxit = 50)
+summary(fig_log)
+plotgroupresiduals(fig_log, m=1, trim = F) #, trim = F, m =1
+
+#on élimine drv_age2, bonus,vh_cyl,densite,pol_payd,vh_make_G,risk_class_G,vh_fuel
+ 
 
