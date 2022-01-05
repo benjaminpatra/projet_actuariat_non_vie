@@ -70,7 +70,7 @@ BIC(fpois2_f)
 logLik(fpois2_f)
 plotgroupresiduals(fpois2_f, m=10)
 
-
+saveRDS(fpois2_f, "data/model_fpois2_f_freq.rds")
 ### 2) Quasi Poisson -----------------------------------------------------------
 fqpois_i <- glm(claim_nb ~ bonus+densite+drv_age1+drv_age2+pol_coverage+pol_pay_freq+
                   pol_payd+REG_LABEL+risk_class_G+vh_age_G2+vh_cyl_G+vh_fuel+
@@ -168,6 +168,7 @@ fgamma2 <- glm(claim_amount_ecrete ~ drv_age1+
               family=Gamma("log"), data=data_claims_ecrete_year0)
 summary(fgamma2)
 
+saveRDS(fgamma2,"data/model_fgamma2_sev.rds")
 #On supprime bonus et vh_make_G 
 # risk_class_G
 #drv_age2 vh_cyl pol_payd densite vh_fuel
