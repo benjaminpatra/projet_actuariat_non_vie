@@ -1,8 +1,8 @@
 # Import packages ---------------------------------------------------------
 
+library(MASS)
 library(tidyverse)
 library(pscl)
-library(MASS)
 library(corrplot)
 source("./codes/02_plot_function.R")
 
@@ -117,6 +117,29 @@ BIC(fnb_i)
 logLik(fnb_i)
 
 
+# Step AIC ----------------------------------------------------------------
+
+data_freq <- data_freq_year0 %>% 
+  select(claim_nb,
+         drv_age1,
+         drv_age_lic1,
+         vh_cyl_G,
+         drv_age2,
+         vh_fuel,
+         bonus,
+         densite,
+         pol_coverage,
+         pol_pay_freq,
+         pol_payd,
+         REG_LABEL,
+         risk_class_G,
+         vh_age_G2,
+         vh_make_G,
+         vh_value_G3)
+
+glmreg = glm(claim_nb ~.,family = negative.binomial(1/0.229), data = data_freq)
+glmreg_AIC <- stepAIC(glmreg, direction = 'both')
+summary(glmreg_AIC)
 
 "bonus"            "claim_nb"         "densite"          "DEP"              "departement"      "drv_age_lic1"     "drv_age_lic1_G"   "drv_age_lic2"    
 "drv_age_lic2_G"   "drv_age1"         "drv_age1_G1"      "drv_age1_G2"      "drv_age1_G3"      "drv_age2"         "drv_age2_G1"      "drv_age2_G2"     
