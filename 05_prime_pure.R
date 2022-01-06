@@ -14,22 +14,19 @@ result_model_freq <- predict(model_freq, newdata = data_year1, type="response" )
 hist(result_model_freq)
 result_model_freq <- as.data.frame(result_model_freq)
 
-
 result_model_sev <- predict(model_sev, newdata = data_year1, type="response" )
 hist(result_model_sev)
 result_model_sev <- as.data.frame(result_model_sev)
 
 
-data <- data_claims_ecrete_year0 %>%  filter(claim_amount_ecrete < 200)
 
 data_year_1_prime <- cbind(data_year1,result_model_freq,result_model_sev)
 
 data_year_1_prime <- data_year_1_prime %>% 
-  mutate(prime_pure = result_model_freq * result_model_sev)
+  mutate(prime_pure = result_model_freq * result_model_sev + 52.47)
 
 hist(data_year_1_prime$prime_pure)
 
-bizarre <- data_year_1_prime %>% filter(prime_pure < 20)
 
 boxplot(data_year_1_prime$prime_pure~data_year_1_prime$drv_age1,varwidth = TRUE, notch = TRUE, outline = TRUE)
 
