@@ -31,4 +31,6 @@ hist(data_year_1_prime$prime_pure)
 
 bizarre <- data_year_1_prime %>% filter(prime_pure < 20)
 
-boxplot(data_year_1_prime$prime_pure~data_year_1_prime$pol_coverage,varwidth = TRUE, notch = TRUE, outline = TRUE)
+boxplot(data_year_1_prime$prime_pure~data_year_1_prime$drv_age1,varwidth = TRUE, notch = TRUE, outline = TRUE)
+
+boxplot(data_year_1_prime$prime_pure~data_year_1_prime$vh_age,varwidth = TRUE, notch = TRUE, outline = TRUE)
