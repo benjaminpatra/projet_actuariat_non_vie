@@ -35,6 +35,7 @@ freMTPLsev$LClaimAmount <- log(freMTPLsev$ClaimAmount)
 
 freMTPL <- merge(freMTPLfreq, freMTPLsev, by = "PolicyID", all = T) # base avec doublon de policy id
 freMTPLsev <- merge(freMTPLsev, freMTPLfreq, by = "PolicyID", al.x = T) # base des claims
+freMTPL_filtered <- freMTPL %>% filter(ClaimAmount<=1125 | ClaimAmount>=1221)
 
 #*******************************************************************#
 # Régression pour la fréquence ----------------
@@ -64,8 +65,7 @@ fpois2 <- glm(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
               family=poisson("log"), data=freMTPLfreq)
 summary(fpois2)
 #xtable(coef(summary(fpois2)), digits=3) 
-plotgroupresiduals(fpois2) #, trim = F, m =1
-
+results_model(fpois2)
 
 ### Modele Poisson sur dispersée (quasi poisson) ----
 fqpois3 <- glm(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
@@ -73,7 +73,8 @@ fqpois3 <- glm(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
                family=quasipoisson("log"), data=freMTPLfreq)
 summary(fqpois3)
 summary(fqpois3)$dispersion #phi
-plotgroupresiduals(fqpois3) #, trim = F, m =1
+results_model(fqpois3)
+
 
 
 ### Modele binomiale negative ----
@@ -83,19 +84,21 @@ fnb4 <- glm(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
             +Gas+Region+Density, offset=log(Exposure),
             family=negative.binomial(phi), data=freMTPLfreq)
 summary(fnb4)
+results_model(fnb4)
 
 # Deuxième méthode : estimer theta
 fnb5 <- glm.nb(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
                +Gas+Region+Density+offset(log(Exposure)),
                data=freMTPLfreq)
 summary(fnb5)
+results_model(fnb5)
 
 
 ### Zero inflaté (PAS BON) ----
-fzip_logit <- zeroinfl(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
-               +Gas+Region+LDensity+offset(log(Exposure)),
-               data=freMTPLfreq, dist = "poisson", link = "logit")
-summary(fzip_logit)
+# fzip_logit <- zeroinfl(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
+#                +Gas+Region+LDensity+offset(log(Exposure)),
+#                data=freMTPLfreq, dist = "poisson", link = "logit")
+# summary(fzip_logit)
 # 
 # fzip_probit <- zeroinfl(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
 #                        +Gas+Region+LDensity+offset(log(Exposure)),
@@ -108,9 +111,7 @@ fzmP_logit <- hurdle(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
                      dist = "poisson", link = "logit",
                      data=freMTPLfreq)
 summary(fzmP_logit) # Pas trop mal mais pas tt a fait comme dans le cours
-AIC(fzmP_logit)
-BIC(fzmP_logit)
-plotgroupresiduals(fzmP_logit, m=50) #, trim = F, m =1
+results_model(fzmP_logit, m= 50, dev = F)
 
 
 fzmP_probit <- hurdle(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
@@ -118,9 +119,8 @@ fzmP_probit <- hurdle(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
                      dist = "poisson", link = "probit",
                      data=freMTPLfreq)
 summary(fzmP_probit) # Presque bon
-AIC(fzmP_probit)
-BIC(fzmP_probit)
-plotgroupresiduals(fzmP_probit, m=50) #, trim = F, m =1
+results_model(fzmP_probit, m= 50, dev = F)
+
 
 
 fzmP_clolog <- hurdle(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
@@ -128,9 +128,8 @@ fzmP_clolog <- hurdle(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
                       dist = "poisson", link = "cloglog",
                       data=freMTPLfreq)
 summary(fzmP_clolog) # Presque bon
-AIC(fzmP_clolog)
-BIC(fzmP_clolog)
-plotgroupresiduals(fzmP_clolog, m=50) #, trim = F, m =1
+results_model(fzmP_clolog, m= 50, dev = F)
+
 
 
 fzmP_cauchit <- hurdle(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
@@ -138,9 +137,8 @@ fzmP_cauchit <- hurdle(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
                       dist = "poisson", link = "cauchit",
                       data=freMTPLfreq)
 summary(fzmP_cauchit) # Presque bon
-AIC(fzmP_cauchit)
-BIC(fzmP_cauchit)
-plotgroupresiduals(fzmP_cauchit, m=50) #, trim = F, m =1
+results_model(fzmP_cauchit, m= 50, dev = F)
+
 
 
 fzmNB_logit <- hurdle(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
@@ -148,15 +146,13 @@ fzmNB_logit <- hurdle(ClaimNb ~ Power+CarAgeG+DriverAgeG+Brand
                      dist = "negbin", link = "logit",
                      data=freMTPLfreq)
 summary(fzmNB_logit) # Presque bon
-AIC(fzmNB_logit)
-BIC(fzmNB_logit)
-plotgroupresiduals(fzmNB_logit, m=50) #, trim = F, m =1
+results_model(fzmNB_logit, m= 50, dev = F)
+
 
 
 #*******************************************************************#
 # Régression pour la severite ----------------
 #*******************************************************************#
-freMTPL_filtered <- freMTPL %>% filter(ClaimAmount<=1125 | ClaimAmount>=1221)
 
 ### Stats desc ----
 summary(freMTPL)
@@ -205,37 +201,31 @@ fun_boxplot(freMTPL_filtered, "DriverAge", "ClaimAmount")
 fgamma <- glm(ClaimAmount ~ DriverAgeG+LDensity,
               family=Gamma("log"), data=freMTPL_filtered)
 summary(fgamma)
-AIC(fgamma)
-BIC(fgamma)
-logLik(fgamma)
-plotgroupresiduals(fgamma, m=1, trim = F) #, trim = F, m =1
+results_model(fgamma, m = 1, trim = F)
 
 ### Modele Inverse gaussienne lien log ----
 fig_log <- glm(ClaimAmount ~ DriverAgeG+LDensity,
               family=inverse.gaussian(link = "log"), data=freMTPL_filtered, maxit = 50)
 summary(fig_log)
-AIC(fig_log)
-BIC(fig_log)
-logLik(fig_log)
-plotgroupresiduals(fig_log, m=1, trim = F) #, trim = F, m =1
+results_model(fig_log, m = 1, trim = F)
 
 ### Modele log gamma ----
 flgamma <- glm(LClaimAmount ~ DriverAgeG+LDensity,
                family=Gamma("identity"), data=freMTPLsev)
 summary(flgamma)
-AIC(flgamma)
-BIC(flgamma)
-logLik(flgamma)
-plotgroupresiduals(flgamma, m=1, trim = F) #, trim = F, m =1
+results_model(flgamma, m = 1, trim = F)
 
 ### LogNormale ----
 flnormale <- glm(LClaimAmount ~ DriverAgeG+LDensity,
-               gaussian(link = "identity"), data=freMTPL_filtered)
+                 family = gaussian("log"),
+               data=freMTPL_filtered)
 summary(flnormale)
-AIC(flnormale)
-BIC(flnormale)
-logLik(flnormale)
-plotgroupresiduals(flnormale, m=1, trim = F) #, trim = F, m =1
+results_model(flnormale, m = 1, trim = F)
+
+flnormale2 <- lm(LClaimAmount ~ DriverAgeG+LDensity,
+                 data=freMTPL_filtered)
+summary(flnormale2)
+results_model(flnormale2, m = 1, trim = F)
 
 
 
@@ -261,28 +251,29 @@ freMTPLsev <- freMTPLsev %>%
 fgamma_e <- glm(ClaimAmount_ecrete ~ DriverAgeG+LDensity,
               family=Gamma("log"), data=freMTPL_filtered)
 summary(fgamma_e)
-logLik(fgamma_e)
+results_model(fgamma_e, m = 1, trim = F)
+
 
 ### 2) Log gamma (PAS BON)---- 
 flgamma_e <- glm(LClaimAmount_ecrete ~ DriverAgeG+LDensity,
                 family=Gamma("identity"), data=freMTPL_filtered)
 summary(flgamma_e)
-logLik(flgamma_e)
+results_model(flgamma_e, m = 1, trim = F)
+
 
 ### 3) Inverse Gaussienne ----
 fig_log_e <- glm(ClaimAmount_ecrete ~ DriverAgeG+LDensity,
                family=inverse.gaussian(link = "log"), data=freMTPL_filtered)
 summary(fig_log_e)
-AIC(fig_log_e)
-BIC(fig_log_e)
-logLik(fig_log_e)
+results_model(fig_log_e, m = 1, trim = F)
+
 
 ### 4) Log Normale (PAS BON)----
 flnormale_e <- glm(LClaimAmount ~ DriverAgeG+LDensity,
                  gaussian(link = "identity"), data=freMTPL_filtered)
 summary(flnormale_e)
-BIC(flnormale_e)
-logLik(flnormale_e)
+results_model(flnormale_e, m = 1, trim = F)
+
 
 
 #*******************************************************************#
@@ -305,24 +296,25 @@ freMTPL_inf <- freMTPL_inf %>% mutate(ClaimAmount_inflate = ClaimAmount +792.057
 fgamma_s <- glm(ClaimAmount ~ DriverAgeG+LDensity,
                 family=Gamma("log"), data=freMTPL_inf)
 summary(fgamma_s)
-logLik(fgamma_s)
+results_model(fgamma_s, m = 1, trim = F)
+
 
 ### 2) Log gamma (PAS BON)----
 flgamma_s <- glm(LClaimAmount ~ DriverAgeG+LDensity,
                  family=Gamma("identity"), data=freMTPL_inf)
 summary(flgamma_s)
-logLik(flgamma_s)
+results_model(flgamma_s, m = 1, trim = F)
+
 
 ### 3) Inverse Gaussienne (PRESQUE BON)----
 fig_log_s <- glm(ClaimAmount ~ DriverAgeG+LDensity,
                  family=inverse.gaussian(link = "log"), data=freMTPL_inf, maxit = 50)
 summary(fig_log_s)
-BIC(fig_log_s)
-logLik(fig_log_s)
+results_model(fig_log_s, m = 1, trim = F)
+
 
 ### 4) Log Normale (PAS BON)----
-flnormale_s <- glm(LClaimAmount ~ DriverAgeG+LDensity,
-                  gaussian(link = "identity"), data=freMTPL_inf)
+flnormale_s <- lm(log(ClaimAmount) ~ DriverAgeG+Density,
+                  data=freMTPL_inf)
 summary(flnormale_s)
-BIC(flnormale_s)
-logLik(flnormale_s)
+results_model(flnormale_s, m = 1, trim = F, dev = F)
