@@ -1,6 +1,6 @@
 
 #### simulation de charge sinistre portefeuille non parametrique ####
-rclaimnb <- function(n, mydata, var="ClaimNb")
+rclaimnb <- function(n, mydata, var="claim_nb")
 {
   nbrow <- NROW(mydata)
   rclaimnb1 <- function()
@@ -10,9 +10,9 @@ rclaimnb <- function(n, mydata, var="ClaimNb")
   }
   replicate(n, rclaimnb1())
 }
-rclaimnb(6, freMTPLfreq)
+#rclaimnb(6, freMTPLfreq)
 
-rclaimagg <- function(n, mydatanb, mydataamount, varnb="ClaimNb", varamount="ClaimAmount")
+rclaimagg <- function(n, mydatanb, mydataamount, varnb="claim_nb", varamount="claim_amount")
 {
   nbrow <- NROW(mydataamount)
   ragg1 <- function(nbclaim)
@@ -24,7 +24,7 @@ rclaimagg <- function(n, mydatanb, mydataamount, varnb="ClaimNb", varamount="Cla
   sapply(rnb, ragg1)
 }
 #essai
-rclaimagg(6, freMTPLfreq, freMTPLsev)
+#rclaimagg(6, freMTPLfreq, freMTPLsev)
 #10 000 simu
-rbootclaimagg <- rclaimagg(1e4, freMTPLfreq, freMTPLsev)
+#rbootclaimagg <- rclaimagg(1e4, freMTPLfreq, freMTPLsev)
 
