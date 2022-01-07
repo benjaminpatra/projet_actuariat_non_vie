@@ -4,11 +4,12 @@ library(MASS)
 library(tidyverse)
 library(pscl)
 library(corrplot)
-#source("./codes/02_plot_function.R")
+source("./codes/02_plot_function.R")
 source("02_plot_function.R")
 
 # Import data -------------------------------------------------------------
 
+data_claims_year0 <- readRDS("data/data_claims_year0.rds")
 data_claims_ecrete_year0 <- readRDS("data/data_claims_ecrete_year0.rds")
 data_freq_year0 <-readRDS("data/data_freq_year0.rds")
 
@@ -18,7 +19,10 @@ data_freq_num <- select_if(data_freq_year0, is.numeric)
 corr = cor(data_freq_num,use = "complete.obs")
 corrplot(corr, type="upper", tl.col="black", tl.srt=45)
 
-# Modeles de frequence ----------------------------------------------------
+
+#*******************************************************************#
+# Modèle de frequence -----------------
+#*******************************************************************#
 
 ### 1) Log Poisson --------------------------------------------------------
 
@@ -68,7 +72,7 @@ summary(fpois2_f)
 AIC(fpois2_f)
 BIC(fpois2_f)
 logLik(fpois2_f)
-plotgroupresiduals(fpois2_f, m=10)
+plotgroupresiduals(fpois2_f, m= 30)
 
 saveRDS(fpois2_f, "data/model_fpois2_f_freq.rds")
 ### 2) Quasi Poisson -----------------------------------------------------------
@@ -104,18 +108,20 @@ fnb_i <- glm(claim_nb ~ bonus+densite+drv_age1+drv_age2+pol_coverage+pol_pay_fre
 summary(fnb_i)
 
 # REG_LABEL
-densite
-drv_age2
-vh_cyl_G
+# densite
+# drv_age2
+# vh_cyl_G
 
-fnb_i <- glm(claim_nb ~ bonus+drv_age1+pol_coverage+pol_pay_freq+
+fnb_f <- glm(claim_nb ~ bonus+drv_age1+pol_coverage+pol_pay_freq+
                pol_payd+risk_class_G+vh_age_G2+vh_fuel+
                vh_make_G+vh_value_G3, 
              family=negative.binomial(phi), data=data_freq_year0)
-summary(fnb_i)
-AIC(fnb_i)
-BIC(fnb_i)
-logLik(fnb_i)
+summary(fnb_f)
+AIC(fnb_f)
+BIC(fnb_f)
+logLik(fnb_f)
+plotgroupresiduals(fnb_f, m = 30) #, trim = F, m =1
+
 
 
 # Step AIC ----------------------------------------------------------------
@@ -138,61 +144,102 @@ data_freq <- data_freq_year0 %>%
          vh_make_G,
          vh_value_G3)
 
-glmreg = glm(claim_nb ~.,family = negative.binomial(1/0.229), data = data_freq)
+glmreg = glm(claim_nb ~.,family = negative.binomial(phi), data = data_freq)
 glmreg_AIC <- stepAIC(glmreg, direction = 'both')
 summary(glmreg_AIC)
 
-"bonus"            "claim_nb"         "densite"          "DEP"              "departement"      "drv_age_lic1"     "drv_age_lic1_G"   "drv_age_lic2"    
-"drv_age_lic2_G"   "drv_age1"         "drv_age1_G1"      "drv_age1_G2"      "drv_age1_G3"      "drv_age2"         "drv_age2_G1"      "drv_age2_G2"     
-"drv_age2_G3"      "drv_drv2"         "drv_sex1"         "drv_sex2"         "id_client"        "id_policy"        "id_vehicle"       "id_year"         
-"Ldensite"         "Lvh_cyl"          "Lvh_value"        "Lvh_weight"       "pol_bonus"        "pol_coverage"     "pol_duration"     "pol_insee_code"  
-"pol_pay_freq"     "pol_payd"         "pol_sit_duration" "pol_usage"        "REG"              "REG_LABEL"        "risk_class"       "risk_class_G"    
-"vh_age"           "vh_age_G1"        "vh_age_G2"        "vh_age_G3"        "vh_cyl"           "vh_cyl_G"         "vh_din"           "vh_fuel"         
-"vh_make"          "vh_make_G"        "vh_model"         "vh_sale_begin"    "vh_sale_end"      "vh_speed"         "vh_type"          "vh_value"        
-"vh_value_G1"      "vh_value_G2"      "vh_weight"     
+glmreg_p = glm(claim_nb ~.,family = poisson("log"), data = data_freq)
+glmreg_p_AIC <- stepAIC(glmreg_p, direction = 'both')
+summary(glmreg_p_AIC)
 
 
-# Modèle pour la sévérité -------------------------------------------------
+#*******************************************************************#
+# Modèle pour la sévérité -----------------
+#*******************************************************************#
 
-fgamma <- glm(claim_amount_ecrete ~ drv_age1 +Ldensite,
+# -------------------------------------------------------------------------------#
+### A) MODELES SIMPLES : --------------------------------------------------------
+# -------------------------------------------------------------------------------#
+### 1) Modele Gamma lien log ----
+fgamma <- glm(claim_amount ~ drv_age1 +Ldensite,
               family=Gamma("log"), data=data_claims_ecrete_year0)
 summary(fgamma)
 plotgroupresiduals(fgamma, m=1, trim = F) #, trim = F, m =1
 
 
-fgamma2 <- glm(claim_amount_ecrete ~ drv_age1+
-               pol_coverage+
-               pol_pay_freq+
-               vh_age_G2+
-               vh_value_G3,
-              family=Gamma("log"), data=data_claims_ecrete_year0)
+fgamma2 <- glm(claim_amount ~ drv_age1+
+                 pol_coverage+
+                 pol_pay_freq+
+                 vh_age_G2+
+                 vh_value_G3,
+               family=Gamma("log"), data=data_claims_ecrete_year0)
 summary(fgamma2)
+AIC(fgamma2)
+BIC(fgamma2)
+logLik(fgamma2)
 
 saveRDS(fgamma2,"data/model_fgamma2_sev.rds")
 #On supprime bonus et vh_make_G 
 # risk_class_G
 #drv_age2 vh_cyl pol_payd densite vh_fuel
 
-f_loggamma <- glm(log_claim_amount_ecrete ~ drv_age1+
+
+### 3) Modele Inverse gaussienne lien log ----
+fig_log <- glm(claim_amount ~ drv_age1+
+                 pol_coverage+
+                 pol_pay_freq+
+                 vh_age_G2+
+                 vh_value_G3,
+               family=inverse.gaussian("log"), data=data_claims_ecrete_year0, maxit = 50)
+summary(fig_log)
+plotgroupresiduals(fig_log, m=1, trim = F) #, trim = F, m =1
+
+# -------------------------------------------------------------------------------#
+### B) MODELES ECRETES : --------------------------------------------------------
+# -------------------------------------------------------------------------------#
+
+### 1) Modele Gamma lien log ----
+fgamma_e <- glm(claim_amount_ecrete ~ drv_age1 +Ldensite,
+              family=Gamma("log"), data=data_claims_ecrete_year0)
+summary(fgamma_e)
+plotgroupresiduals(fgamma, m=1, trim = F) #, trim = F, m =1
+
+
+fgamma2_e <- glm(claim_amount_ecrete ~ drv_age1+
+               pol_coverage+
+               pol_pay_freq+
+               vh_age_G2+
+               vh_value_G3,
+              family=Gamma("log"), data=data_claims_ecrete_year0)
+summary(fgamma2_e)
+
+saveRDS(fgamma2_e,"data/model_fgamma2_sev_e.rds")
+#On supprime bonus et vh_make_G 
+# risk_class_G
+#drv_age2 vh_cyl pol_payd densite vh_fuel
+
+
+
+### 2) Modele log Gamma ----
+f_loggamma_e <- glm(log_claim_amount_ecrete ~ drv_age1+
                  pol_coverage+
                  pol_pay_freq+
                  vh_age_G2+
                  vh_value_G3,
                family=Gamma("identity"), data=data_claims_ecrete_year0)
-summary(f_loggamma)
+summary(f_loggamma_e)
 
-### Modele Inverse gaussienne lien log ----
+### 3) Modele Inverse gaussienne lien log ----
 
-fig_log <- glm(claim_amount_ecrete ~ drv_age1+
+fig_log_e <- glm(claim_amount_ecrete ~ drv_age1+
                  pol_coverage+
                  pol_pay_freq+
                  vh_age_G2+
-                 vh_value_G3
-                 ,
+                 vh_value_G3,
                family=inverse.gaussian("log"), data=data_claims_ecrete_year0, maxit = 50)
-summary(fig_log)
-plotgroupresiduals(fig_log, m=1, trim = F) #, trim = F, m =1
+summary(fig_log_e)
+plotgroupresiduals(fig_log_e, m=1, trim = F) #, trim = F, m =1
 
 #on élimine drv_age2, bonus,vh_cyl,densite,pol_payd,vh_make_G,risk_class_G,vh_fuel
  
-
+### 4)
