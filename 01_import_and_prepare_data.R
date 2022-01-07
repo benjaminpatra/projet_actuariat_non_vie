@@ -57,16 +57,16 @@ data_policy$vh_age_G1 <- cut(data_policy$vh_age,c(-1, 0:1*5, 100))
 data_policy$vh_age_G2 <- cut(data_policy$vh_age,c(-1,10,20,100))
 data_policy$vh_age_G3 <- cut(data_policy$vh_age,c(-1,0,1,2,3,4,5,6,7,8,9,10,100))
 
-data_policy$vh_value_G1 <- cut(data_policy$vh_value,c(seq(from = -1, to = 100000, by = 10000),Inf))
-data_policy$vh_value_G2 <- cut(data_policy$vh_value,c(seq(from = -1, to = 100000, by = 50000),Inf))
-data_policy$vh_value_G3 <- cut(data_policy$vh_value,c(seq(from = -1, to = 50000, by = 10000),Inf))
+data_policy$vh_value_G1 <- cut(data_policy$vh_value,c(seq(from = 0, to = 100000, by = 10000),155498))
+data_policy$vh_value_G2 <- cut(data_policy$vh_value,c(seq(from = 0, to = 100000, by = 50000),155498 +1))
+data_policy$vh_value_G3 <- cut(data_policy$vh_value,c(seq(from = 0, to = 50000, by = 10000),155498+1))
 
 
 # Création d'une variables risk_class -------------------------------------
 
 data_policy$risk_class <- (data_policy$vh_din*0.736)*100/ (data_policy$vh_weight + 75)
 data_policy$risk_class_G  <- cut(data_policy$risk_class, 
-                                 breaks=c(quantile(data_policy$risk_class, probs = seq(0, 1, by = 0.20))),labels = 1:5,include.lowest = TRUE)
+                                 breaks=c(quantile(data_policy$risk_class, probs = seq(0, 1, by = 0.20))),labels = 1:5)
 
 data_policy$vh_cyl_G <- cut(data_policy$vh_cyl,c(-1,1500,Inf), labels = 1:2)
 
@@ -154,7 +154,7 @@ data_hist <- data_claims %>%  filter(claim_amount < 10317.52)
 hist(data_hist$claim_amount)
 
 # nous décidons d'utiliser le quantile à 99.5%
-valeur_limite <- as.numeric(quantile(data_claims$claim_amount,0.995))
+valeur_limite <- quantile(data_claims$claim_amount,0.995)
 
 charge_surcrete <- sum(data_claims %>% mutate(surcrete = pmax(claim_amount - valeur_limite, 0)) %>% select(surcrete))
 
@@ -214,16 +214,16 @@ data_year_1$vh_age_G1 <- cut(data_year_1$vh_age,c(-1, 0:1*5, 100))
 data_year_1$vh_age_G2 <- cut(data_year_1$vh_age,c(-1,10,20,100))
 data_year_1$vh_age_G3 <- cut(data_year_1$vh_age,c(-1,0,1,2,3,4,5,6,7,8,9,10,100))
 
-data_year_1$vh_value_G1 <- cut(data_year_1$vh_value,c(seq(from = -1, to = 100000, by = 10000),Inf))
-data_year_1$vh_value_G2 <- cut(data_year_1$vh_value,c(seq(from = -1, to = 100000, by = 50000),Inf))
-data_year_1$vh_value_G3 <- cut(data_year_1$vh_value,c(seq(from = -1, to = 50000, by = 10000),Inf))
+data_year_1$vh_value_G1 <- cut(data_year_1$vh_value,c(seq(from = 0, to = 100000, by = 10000),155498))
+data_year_1$vh_value_G2 <- cut(data_year_1$vh_value,c(seq(from = 0, to = 100000, by = 50000),155498 +1))
+data_year_1$vh_value_G3 <- cut(data_year_1$vh_value,c(seq(from = 0, to = 50000, by = 10000),155498+1))
 
 
 # Création d'une variables risk_class -------------------------------------
 
 data_year_1$risk_class <- (data_year_1$vh_din*0.736)*100/ (data_year_1$vh_weight + 75)
 data_year_1$risk_class_G  <- cut(data_year_1$risk_class, 
-                                 breaks=c(quantile(data_year_1$risk_class, probs = seq(0, 1, by = 0.20))),labels = 1:5,include.lowest = TRUE)
+                                 breaks=c(quantile(data_year_1$risk_class, probs = seq(0, 1, by = 0.20))),labels = 1:5)
 
 data_year_1$vh_cyl_G <- cut(data_year_1$vh_cyl,c(-1,1500,Inf), labels = 1:2)
 
