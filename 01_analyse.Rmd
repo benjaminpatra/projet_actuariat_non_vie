@@ -3,7 +3,7 @@ title: "01_Analyse des données"
 author: "E.Maucuer & B.PATRA"
 date: "12/24/2021"
 output: html_document
-fig_width: 6 
+fig_width: 10
 ---
 
 ```{r setup, include=FALSE}
@@ -55,6 +55,10 @@ fun_plot(data_freq, "drv_age1_G2", "claim_nb")
 fun_plot(data_freq, "drv_age1_G3", "claim_nb")
 ```
 
+### drv_drv2
+```{r plot fre drv_drv2}
+fun_plot(data_freq, "drv_drv2", "claim_nb")
+```
 ### drv_age2
 ```{r plot fre drv_age2}
 fun_plot(data_freq, "drv_age2", "claim_nb")
@@ -186,23 +190,29 @@ mean_variance(data_freq, 'vh_cyl', 'claim_nb')
 ```
 
 # 2- Etude de la severite
-```{r plot severite}
+```{r etude de claim amount}
 summary(data_claims$claim_amount) 
+
 
 ggplot(data_claims, aes(x="1", y=claim_amount)) + 
   geom_boxplot()
 
 ggplot(data_claims, aes(x="1", y=claim_amount)) + 
   geom_boxplot() +
-  coord_cartesian(ylim = quantile(data_claims$claim_amount, c(0.1, 0.99)))
+  coord_cartesian(ylim = c(0,30000))
 
 plot(ecdf(data_claims$claim_amount), xlim = c(0, 5000)) 
 plot(ecdf(data_claims$Lclaim_amount), xlim = c(0, 50)) 
 
+hist(data_claims$claim_amount, nclass = 10)
+hist(data_claims$claim_amount, xlim = c(0,30000), nclass = 100)
+hist(data_claims$claim_amount, xlim = c(0,10000), nclass = 1000)
+hist(data_claims$Lclaim_amount)
+
 names(which(table(data_claims$claim_amount) > 3))
 ```
 
-```{r plot severite 2}
+```{r boxplots, fig_width = 20}
 fun_boxplot(data_claims, "drv_age1_G1", "claim_amount")
 fun_boxplot(data_claims, "drv_age1_G2", "claim_amount")
 fun_boxplot(data_claims, "vh_age_G1", "claim_amount")
