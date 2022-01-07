@@ -37,7 +37,7 @@ data_year_1_prime <- data_year_1_prime %>%
 hist(data_year_1_prime$prime_pure)
 
 #sauvergarde
-saveRDS(data_year_1_prime,"data_year_1_prime.rds")
+saveRDS(data_year_1_prime,"data/data_year_1_prime.rds")
 
 
 
