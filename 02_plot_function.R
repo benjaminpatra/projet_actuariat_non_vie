@@ -44,7 +44,17 @@ fun_boxplot <- function(data, var1, var2){
   data_plot <- data %>% rename(y = eval(var2))
   m = quantile(data_plot$y, 0.9)
 
-  fig <- plot_ly(data = data, color = "grey25") %>% 
+  p1 <- plot_ly(data = data, color = "grey25", showlegend = F) %>% 
+    add_trace(x = as.formula(paste0("~","as.factor(", var1,")")),
+              y = as.formula(paste0("~", var2)), 
+              type = "box",
+              colors = "grey") %>%
+    layout(boxmode = "group",
+           xaxis = list(title = var1),
+           yaxis = list(title = var2, range = c(0, 0.8*m)),
+           title = paste0(var2," by ", var1))
+  
+  p2 <- plot_ly(data = data, color = "grey25", showlegend = F) %>% 
     add_trace(x = as.formula(paste0("~","as.factor(", var1,")")),
               y = as.formula(paste0("~", var2)), 
               type = "box",
@@ -53,7 +63,8 @@ fun_boxplot <- function(data, var1, var2){
            xaxis = list(title = var1),
            yaxis = list(title = var2),
            title = paste0(var2," by ", var1))
-  fig
+  
+    subplot(p1, p2, nrows = 1, margin = 0.05)
 }
 #fun_boxplot(freMTPL_filtered, "DriverAge", "ClaimAmount")
 

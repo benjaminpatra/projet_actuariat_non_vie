@@ -72,10 +72,6 @@ data_policy$vh_cyl_G <- cut(data_policy$vh_cyl,c(-1,1500,Inf), labels = 1:2)
 
 # Création d'une variable regroupant les marques de véhicules --------------
 
-autre <- c("ACL", "APAL", "ARO", "DATSUN", "EBRO", "FSO", "GME", "IVECO", "LADA VAZ", "MORRIS",
-           "OM", "PANHARD", "PIAGGIO", "PININFARINA", "SANTANA", "SAVIEM", "SIMCA", "SMART", "STEYR PUCH",
-           "TALBOT", "TEILHOL", "UMM", "UNIC", "VD 4 ROUES", "WILLYS","AUTOBIANCHI","AUVERLAND","BEDFORD",
-           "BREMACH","BUICK","DAF","DAIHATSU","MAHINDRA","DACIA","COURNIL")
 allemande <- c("AUDI", "BMW", "MERCEDES BENZ", "MINI", "VW PORSCHE")
 asian <- c("ASIA", "DAEWOO", "HONDA", "HYUNDAI", "ISUZU", "KIA", "MAZDA", "MITSUBISHI", 
            "SSANGYONG", "SUBARU", "SUZUKI", "TOYOTA")
@@ -87,15 +83,17 @@ luxe <- c("BENTLEY", "JAGUAR", "LAND ROVER", "LEXUS", "ROVER")
 europe <- c("OPEL", "SAAB", "SEAT", "VOLKSWAGEN", "VOLVO","SKODA","ALFA ROMEO","LANCIA")
 RENAULT <-c("RENAULT","NISSAN")
 
-data_policy$vh_make_G <- ifelse(data_policy$vh_make %in% autre, "autre",
-                               ifelse(data_policy$vh_make %in% allemande, "allemande",
-                                      ifelse(data_policy$vh_make %in% asian, "asian",
-                                             ifelse(data_policy$vh_make %in% sport, "sport",
-                                                    ifelse(data_policy$vh_make %in% americaine, "americaine",
-                                                           ifelse(data_policy$vh_make %in% collection, "collection",
-                                                                  ifelse(data_policy$vh_make %in% luxe,"luxe",
-                                                                         ifelse(data_policy$vh_make %in% europe,"europeenne",
-                                                                                ifelse(data_policy$vh_make %in% RENAULT, "RENAULT",data_policy$vh_make)))))))))
+
+data_policy$vh_make_G <- ifelse(data_policy$vh_make %in% allemande, "allemande",
+                                 ifelse(data_policy$vh_make %in% asian, "asian",
+                                        ifelse(data_policy$vh_make %in% sport, "sport",
+                                               ifelse(data_policy$vh_make %in% americaine, "americaine",
+                                                      ifelse(data_policy$vh_make %in% collection, "collection",
+                                                             ifelse(data_policy$vh_make %in% luxe,"luxe",
+                                                                    ifelse(data_policy$vh_make %in% europe,"europeenne",
+                                                                           ifelse(data_policy$vh_make %in% RENAULT, "RENAULT",
+                                                                                  ifelse(data_policy$vh_make %in% c("PEUGEOT", "CITROEN", "FIAT"), data_policy$vh_make, "autre")))))))))
+
 
 
 # Création du log des variables -------------------------------------------
@@ -229,30 +227,26 @@ data_year_1$vh_cyl_G <- cut(data_year_1$vh_cyl,c(-1,1500,Inf), labels = 1:2)
 
 # Création d'une variable regroupant les marques de véhicules --------------
 
-autre <- c("ACL", "APAL", "ARO", "DATSUN", "EBRO", "FSO", "GME", "IVECO", "LADA VAZ", "MORRIS",
-           "OM", "PANHARD", "PIAGGIO", "PININFARINA", "SANTANA", "SAVIEM", "SIMCA", "SMART", "STEYR PUCH",
-           "TALBOT", "TEILHOL", "UMM", "UNIC", "VD 4 ROUES", "WILLYS","AUTOBIANCHI","AUVERLAND","BEDFORD",
-           "BREMACH","BUICK","DAF","DAIHATSU","MAHINDRA","DACIA","COURNIL")
-allemande <- c("AUDI", "BMW", "MERCEDES BENZ", "MINI", "VW PORSCHE")
-asian <- c("ASIA", "DAEWOO", "HONDA", "HYUNDAI", "ISUZU", "KIA", "MAZDA", "MITSUBISHI", 
-           "SSANGYONG", "SUBARU", "SUZUKI", "TOYOTA")
-sport <- c("ALPINE", "CORVETTE", "FERRARI", "LOTUS", "MASERATI", "PORSCHE")
-americaine <- c("CADILLAC", "CHEVROLET", "CHRYSLER", "DODGE", "FORD", "HUMMER", "JEEP")
-collection <- c("AUSTIN", "AUSTIN HEALEY", "BERTONE", "DAIMLER", "HOTCHKISS", "MG", "MORGAN", "PININFARINA", 
-                "TRIUMPH","PONTIAC")
-luxe <- c("BENTLEY", "JAGUAR", "LAND ROVER", "LEXUS", "ROVER")
-europe <- c("OPEL", "SAAB", "SEAT", "VOLKSWAGEN", "VOLVO","SKODA","ALFA ROMEO","LANCIA")
-RENAULT <-c("RENAULT","NISSAN")
+# allemande <- c("AUDI", "BMW", "MERCEDES BENZ", "MINI", "VW PORSCHE")
+# asian <- c("ASIA", "DAEWOO", "HONDA", "HYUNDAI", "ISUZU", "KIA", "MAZDA", "MITSUBISHI", 
+#            "SSANGYONG", "SUBARU", "SUZUKI", "TOYOTA")
+# sport <- c("ALPINE", "CORVETTE", "FERRARI", "LOTUS", "MASERATI", "PORSCHE")
+# americaine <- c("CADILLAC", "CHEVROLET", "CHRYSLER", "DODGE", "FORD", "HUMMER", "JEEP")
+# collection <- c("AUSTIN", "AUSTIN HEALEY", "BERTONE", "DAIMLER", "HOTCHKISS", "MG", "MORGAN", "PININFARINA", 
+#                 "TRIUMPH","PONTIAC")
+# luxe <- c("BENTLEY", "JAGUAR", "LAND ROVER", "LEXUS", "ROVER")
+# europe <- c("OPEL", "SAAB", "SEAT", "VOLKSWAGEN", "VOLVO","SKODA","ALFA ROMEO","LANCIA")
+# RENAULT <-c("RENAULT","NISSAN")
 
-data_year_1$vh_make_G <- ifelse(data_year_1$vh_make %in% autre, "autre",
-                                ifelse(data_year_1$vh_make %in% allemande, "allemande",
-                                       ifelse(data_year_1$vh_make %in% asian, "asian",
-                                              ifelse(data_year_1$vh_make %in% sport, "sport",
-                                                     ifelse(data_year_1$vh_make %in% americaine, "americaine",
-                                                            ifelse(data_year_1$vh_make %in% collection, "collection",
-                                                                   ifelse(data_year_1$vh_make %in% luxe,"luxe",
-                                                                          ifelse(data_year_1$vh_make %in% europe,"europeenne",
-                                                                                 ifelse(data_year_1$vh_make %in% RENAULT, "RENAULT",data_year_1$vh_make)))))))))
+data_year_1$vh_make_G <- ifelse(data_year_1$vh_make %in% allemande, "allemande",
+                                 ifelse(data_year_1$vh_make %in% asian, "asian",
+                                        ifelse(data_year_1$vh_make %in% sport, "sport",
+                                               ifelse(data_year_1$vh_make %in% americaine, "americaine",
+                                                      ifelse(data_year_1$vh_make %in% collection, "collection",
+                                                             ifelse(data_year_1$vh_make %in% luxe,"luxe",
+                                                                    ifelse(data_year_1$vh_make %in% europe,"europeenne",
+                                                                           ifelse(data_year_1$vh_make %in% RENAULT, "RENAULT",
+                                                                                  ifelse(data_year_1$vh_make %in% c("PEUGEOT", "CITROEN", "FIAT"), data_year_1$vh_make, "autre")))))))))
 
 
 # Création du log des variables -------------------------------------------
