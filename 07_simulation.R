@@ -4,6 +4,7 @@ library(tidyverse)
 
 # Import data and functions -----------------------------------------------
 
+data_claims <- readRDS("data/data_claims_year0.rds")
 data_year_1_prime <- readRDS("data/data_year_1_prime.rds")
 source("nonparam-bootstrap-aggclaim.R")
 
@@ -17,7 +18,7 @@ data_year_1_sev <- data_year_1_prime %>%
   select(- result_model_freq) %>% 
   rename(claim_amount = result_model_sev)
 
-result_charge_simulation <- rclaimagg(1e3, data_year_1_freq, data_year_1_sev)
+result_charge_simulation <- rclaimagg(1e4, data_year_1_freq , data_claims)
 
 #fonction_repartition <- ecdf(result_charge_simulation)
 #plot(fonction_repartition)
@@ -54,7 +55,24 @@ legend(x = "topright", # location of legend within plot area
        col = c("chocolate3", "royalblue", "red","green","orange"),
        lwd = c(2, 2, 2))
 
-
 # Determination de la fonction de repartition associée
 
+vec <- seq(0.907,1,0.001)
 
+data_kappa<- as.data.frame(vec)
+
+data_kappa <- data_kappa %>% 
+  mutate(valeur = quantile(result_charge_simulation, vec),
+         ecart = 100*(quantile(result_charge_simulation, vec)- sum(data_year_1_prime$prime_pure))/sum(data_year_1_prime$prime_pure))
+
+
+
+plot(x = data_kappa$vec, y =data_kappa$ecart,type = "l")
+
+  
+  
+(quantile(result_charge_simulation, 0.95)- sum(data_year_1_prime$prime_pure))/sum(data_year_1_prime$prime_pure)
+
+  
+  
+  
