@@ -18,7 +18,8 @@
 /*.Rcheck/
 
 # RStudio files
-.Rproj.
+.Rproj.user/
+.Rproj
 
 # produced vignettes
 vignettes/*.html
@@ -42,3 +43,5 @@ plot/
 data/DEPARTEMENTS/*
 .zip
 data/ENSAE-15MAPA/
+data/*.zip
+draft/*
