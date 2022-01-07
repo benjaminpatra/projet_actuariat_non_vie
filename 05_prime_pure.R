@@ -11,11 +11,11 @@ data_year1 <- readRDS("data/data_complete_year1.rds")
 
 
 # Import model ------------------------------------------------------------
+
 model_freq <-  readRDS("data/model_fpois2_f_freq.rds")
 model_sev <- readRDS("data/model_fgamma2_sev.rds")
-
-
 # Run model on data_YEAR_1 ------------------------------------------------
+
 
 #modèle de fréquence
 result_model_freq <- predict(model_freq, newdata = data_year1, type="response" )

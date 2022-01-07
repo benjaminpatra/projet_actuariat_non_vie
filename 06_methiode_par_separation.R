@@ -7,6 +7,8 @@ library(tidyverse)
 data_claim <- readRDS("data/data_claims_year0.rds")
 data_freq <- readRDS("data/data_freq_year0.rds")
 
+data_year1 <- readRDS("data/data_complete_year1.rds")
+model_freq <-  readRDS("data/model_fpois2_f_freq.rds")
 # On fixe le paramètre de valeur limite -----------------------------------
 
 valeur_limite <- as.numeric(quantile(data_claim$claim_amount,0.995))
@@ -31,10 +33,31 @@ surprime
 
 # On calibre alors le modèle que sur les risques attritionnels
 
-fgamma <- glm(claim_amount ~ drv_age1+
+fgamma_inf <- glm(claim_amount ~ drv_age1+
                  pol_coverage+
                  pol_pay_freq+
                  vh_age_G2+
                  vh_value_G3,
-               family=Gamma("log"), data=data_claim_inferieur)
+               family=Gamma("log"), data=data_claim_attritionel)
 summary(fgamma)
+
+################################
+#Ajouter pour comparer mais à supp
+################################
+
+#modèle de sévérité
+result_model_sev_inf <- predict(fgamma_inf, newdata = data_year1, type="response" )
+
+result_model_sev_inf <- as.data.frame(result_model_sev_inf)
+
+
+#modèle de fréquence
+result_model_freq <- predict(model_freq, newdata = data_year1, type="response" )
+result_model_freq <- as.data.frame(result_model_freq)
+
+#Combinaison des résultats
+data_year_1_prime <- cbind(data_year1,result_model_freq,result_model_sev_inf)
+
+#Calcul de la prime
+data_year_1_prime <- data_year_1_prime %>% 
+  mutate(prime_pure = result_model_freq * result_model_sev_inf + surprime)
