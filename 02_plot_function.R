@@ -218,7 +218,7 @@ pred_group <- function(data, model, var_nb, var_group){
 
 
 
-results_model <- function(model, m=100, trim = T, plot_res = T, dev = T){
+results_model2 <- function(model, m=100, trim = T, plot_res = T, dev = T){
   print(paste("log-vraisemblance =", round(logLik(model),2) ))
   print(paste("AIC =", round(AIC(model),2) ))
   print(paste("BIC =", round(BIC(model),2) ))
@@ -230,3 +230,18 @@ results_model <- function(model, m=100, trim = T, plot_res = T, dev = T){
     plotgroupresiduals(model, m= m, trim = trim)
   }
 }
+
+
+results_model <- function(model, m=100, trim = T, plot_res = T, dev = T){
+  print(as.numeric(round(logLik(model),2)))
+  print(round(AIC(model),2)) 
+  print(round(BIC(model),2)) 
+  if (dev){
+    print(round(model$deviance,2) )
+    print( round(model$null.deviance - model$deviance,2) )
+  }
+  if (plot_res){
+    plotgroupresiduals(model, m= m, trim = trim)
+  }
+}
+

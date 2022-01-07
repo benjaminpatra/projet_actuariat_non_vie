@@ -9,9 +9,9 @@ source("02_plot_function.R")
 
 # Import data -------------------------------------------------------------
 
-data_claims_year0 <- readRDS("../data/data_claims_year0.rds")
-data_claims_ecrete_year0 <- readRDS("../data/data_claims_ecrete_year0.rds")
-data_freq_year0 <-readRDS("../data/data_freq_year0.rds")
+data_claims_year0 <- readRDS("data/data_claims_year0.rds")
+data_claims_ecrete_year0 <- readRDS("data/data_claims_ecrete_year0.rds")
+data_freq_year0 <-readRDS("data/data_freq_year0.rds")
 
 
 # Correlation -------------------------------------------------------------
@@ -126,6 +126,7 @@ fnb2_f <- glm.nb(claim_nb ~ bonus+drv_age1+pol_coverage+pol_pay_freq+
                vh_make_G+vh_value_G3, data=data_freq_year0)
 summary(fnb2_f)
 results_model(fnb2_f)
+saveRDS(fnb2_f,"data/binomial_neg.rds")
 
 
 ### Step AIC ----------------------------------------------------------------
@@ -239,16 +240,16 @@ results_model(fgamma2, m = 50)
 saveRDS(fgamma2,"data/model_fgamma2_sev.rds")
 
 
-### 3) Modele Inverse gaussienne lien log ----
+### 3) Modele Inverse gaussienne lien 1/mu^2 ---- 
 fig_log <- glm(claim_amount ~ drv_age1+
                  pol_coverage+
                  pol_pay_freq+
                  vh_age_G2+
                  vh_value_G3,
-               family=inverse.gaussian("log"), data=data_claims_ecrete_year0, maxit = 50)
+               family=inverse.gaussian("1/mu^2"), data=data_claims_ecrete_year0, maxit = 50)
 summary(fig_log)
 results_model(fig_log, m = 1, trim = F)
-
+#ni log ni 1/muê ne fonctionne
 
 ### 4) Modele Log Normal ----
 flnorm <- lm(log(claim_amount) ~ drv_age1+
@@ -304,7 +305,7 @@ fig_log_e <- glm(claim_amount_ecrete ~ drv_age1+
                  pol_pay_freq+
                  vh_age_G2+
                  vh_value_G3,
-               family=inverse.gaussian("log"), data=data_claims_ecrete_year0, maxit = 50)
+               family=inverse.gaussian("1/mu^2"), data=data_claims_ecrete_year0, maxit = 50)
 summary(fig_log_e)
 results_model(fig_log_e, m = 1, trim = F)
 
@@ -345,7 +346,7 @@ fgamma_s <- glm(claim_amount ~ #bonus+
                 pol_coverage+
                 pol_pay_freq+
                 #pol_payd+
-                REG_LABEL+ # pourrait etre enleve ?
+                #REG_LABEL+ # pourrait etre enleve ?
                 #risk_class_G+
                 vh_age_G2+
                 #vh_cyl_G+
@@ -355,7 +356,7 @@ fgamma_s <- glm(claim_amount ~ #bonus+
                 family=Gamma("log"), data=data_claim_attritionel)
 summary(fgamma_s)
 results_model(fgamma_s)
-
+saveRDS(fgamma_s, "data/fgamma_separe.rds")
 
 ### 2) Modele Inverse Gaussienne lien Log----
 fig_s <- glm(claim_amount ~ drv_age1+
@@ -363,7 +364,7 @@ fig_s <- glm(claim_amount ~ drv_age1+
                   pol_pay_freq+
                   vh_age_G2+
                   vh_value_G3,
-                family=inverse.gaussian("1/mu^2"), data=data_claim_attritionel)
+                family=inverse.gaussian("log"), data=data_claim_attritionel)
 results_model(fig_s)
 
 
