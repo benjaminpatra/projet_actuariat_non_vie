@@ -192,19 +192,41 @@ plotgroupresiduals <- function(object, m=100, trim=TRUE, ...)
 
 
 pred_group <- function(data, model, var_nb, var_group){
-  data_plot <- data %>% rename(group = eval(var_group),
-                               nb = eval(var_nb))
+  data_plot <- data %>% 
+    rename(group = eval(var_group),
+           nb = eval(var_nb)) %>%
+    mutate(pred = predict(model, data, type = "response"))
   
   data_count <- data_plot %>% 
     group_by(group) %>% 
-    summarise(n = n(), obs_freq = mean(nb))
-  print(data_count)
-  ggplot(data_count) +
-    geom_bar(aes(x = as.factor(group), y = obs_freq), stat = 'identity') +
-    geom_point(aes(x = as.factor(group), y = obs_freq))
+    summarise(n = n(), 
+              obs_freq = mean(nb),
+              avg_pred_freq = mean(pred))
   
-  # my_model = model
-  # predict(my_model, newdata, type="response")
+  print(data_count)
+  
+  plot_ly(data_count, colors = c('grey25', 'grey90', "orange")) %>%
+    add_trace(x = ~group, y = ~n, type = "bar", color = 'grey90', name = "") %>%
+    add_trace(x = ~group, y = ~obs_freq, type = "scatter", mode = "markers", yaxis = "y2",color = 'grey25', name = "obs.freq") %>%
+    add_trace(x = ~group, y = ~avg_pred_freq, type = "scatter", mode = "markers", yaxis = "y2",color = 'orange', name = "avg pred.freq") %>%
+    layout(yaxis2 = list(overlaying = "y", side = "right"),
+           xaxis = list(title = var_group))
 }
 
-#pred_group(freMTPLfreq, fpois2, "ClaimNb", "DriverAgeG")
+# pred_group(freMTPLfreq, fnb4, "ClaimNb", "DriverAgeG")
+# pred_group(freMTPLfreq, fnb4, "ClaimNb", "CarAgeG")
+
+
+
+results_model <- function(model, m=100, trim = T, plot_res = T, dev = T){
+  print(paste("log-vraisemblance =", round(logLik(model),2) ))
+  print(paste("AIC =", round(AIC(model),2) ))
+  print(paste("BIC =", round(BIC(model),2) ))
+  if (dev){
+    print(paste("Deviance =", round(model$deviance,2) ))
+    print(paste("Diff null deviance - deviance =", round(model$null.deviance - model$deviance,2) ))
+  }
+  if (plot_res){
+    plotgroupresiduals(model, m= m, trim = trim)
+  }
+}
