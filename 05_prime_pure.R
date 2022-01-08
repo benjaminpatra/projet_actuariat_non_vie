@@ -67,8 +67,13 @@ hist(data_year_1_prime$prime_pure)
 #sauvergarde
 saveRDS(data_year_1_final,"data/data_year_1_prime.rds")
 
+data_year_1_final <- readRDS("data/data_year_1_prime.rds")
 
 
-boxplot(data_year_1_final$prime_pure~data_year_1_prime$drv_age1_G2,varwidth = TRUE, notch = TRUE, outline = TRUE)
-boxplot(data_year_1_final$prime_pure~data_year_1_prime$vh_age,varwidth = TRUE, notch = TRUE, outline = TRUE)
-boxplot(data_year_1_final$prime_pure~data_year_1_prime$pol_coverage,varwidth = TRUE, notch = TRUE, outline = TRUE)
+hist(data_year_1_final$prime_pure, nclass = 30, main = "Histogramme de la prime pure")
+boxplot(data_year_1_final$prime_pure~data_year_1_final$drv_age1_G2, outline = TRUE,
+        main = "Prime pure selon l'âge du conducteur")
+boxplot(data_year_1_final$prime_pure~data_year_1_final$vh_age, outline = TRUE,
+        main = "Prime pure selon la valeur du véhicule")
+boxplot(data_year_1_final$prime_pure~data_year_1_final$pol_coverage, outline = TRUE,
+        main = "Prime pure selon le type de couverture")
