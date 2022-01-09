@@ -1,11 +1,12 @@
 ###############################################################################
 # Voici le code a lancer afin d'obtenir notre prime pure et prime commerciale #
 # E. Maucuer & B. Patra
+# Projet realise sous R version 4.1.2
 ###############################################################################
 # Import Packages
 
-library(MASS)
-library(tidyverse)
+library(MASS) # version 7.3.54
+library(tidyverse) # version 1.3.1
 
 # Preparation des donnees 
 source("codes/01_import_and_prepare_data.R",encoding = "utf-8")
