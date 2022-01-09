@@ -9,9 +9,9 @@ source("02_plot_function.R")
 
 # Import data -------------------------------------------------------------
 
-data_claims_year0 <- readRDS("data/data_claims_year0.rds")
-data_claims_ecrete_year0 <- readRDS("data/data_claims_ecrete_year0.rds")
-data_freq_year0 <-readRDS("data/data_freq_year0.rds")
+data_claims_year0 <- readRDS("../data/data_claims_year0.rds")
+data_claims_ecrete_year0 <- readRDS("../data/data_claims_ecrete_year0.rds")
+data_freq_year0 <-readRDS("../data/data_freq_year0.rds")
 
 
 # Correlation -------------------------------------------------------------
@@ -120,13 +120,24 @@ summary(fnb_f)
 results_model(fnb_f)
 
 
-### 3) Modele binomiale negative theta estime ------------------------------
+### 4) Modele binomiale negative theta estime ------------------------------
 fnb2_f <- glm.nb(claim_nb ~ bonus+drv_age1+pol_coverage+pol_pay_freq+
                pol_payd+risk_class_G+vh_age_G2+vh_fuel+
                vh_make_G+vh_value_G3, data=data_freq_year0)
 summary(fnb2_f)
-results_model(fnb2_f)
-saveRDS(fnb2_f,"data/binomial_neg.rds")
+xtable(summary(fnb2_f))
+results_model(fnb2_f, m =80)
+pred_group(model = fnb2_f, data= data_freq_year0, "claim_nb", "bonus")
+pred_group(model = fnb2_f, data= data_freq_year0, "claim_nb", "drv_age1")
+pred_group(model = fnb2_f, data= data_freq_year0, "claim_nb", "drv_age1_G1")
+pred_group(model = fnb2_f, data= data_freq_year0, "claim_nb", "pol_coverage")
+pred_group(model = fnb2_f, data= data_freq_year0, "claim_nb", "pol_pay_freq")
+pred_group(model = fnb2_f, data= data_freq_year0, "claim_nb", "pol_payd")
+pred_group(model = fnb2_f, data= data_freq_year0, "claim_nb", "risk_class_G")
+pred_group(model = fnb2_f, data= data_freq_year0, "claim_nb", "vh_age_G2")
+pred_group(model = fnb2_f, data= data_freq_year0, "claim_nb", "vh_fuel")
+pred_group(model = fnb2_f, data= data_freq_year0, "claim_nb", "vh_make_G")
+pred_group(model = fnb2_f, data= data_freq_year0, "claim_nb", "vh_value_G3")
 
 
 ### Step AIC ----------------------------------------------------------------
@@ -160,7 +171,7 @@ summary(glmreg_p_AIC)
 results_model(glmreg_p_AIC)
 
 
-### 4) Zero modifie P logit----
+### 5) Zero modifie P logit----
 fzmP_logit <- hurdle(claim_nb ~ bonus+drv_age1+pol_coverage+pol_pay_freq+
                        pol_payd+risk_class_G+vh_age_G2+vh_fuel+
                        vh_make_G+vh_value_G3, 
@@ -170,7 +181,7 @@ summary(fzmP_logit)
 results_model(fzmP_logit, m = 50, dev = F)
 
 
-### 5) Zero modifie P probit----
+### 6) Zero modifie P probit----
 fzmP_probit <- hurdle(claim_nb ~ bonus+drv_age1+pol_coverage+pol_pay_freq+
                         pol_payd+risk_class_G+vh_age_G2+vh_fuel+
                         vh_make_G+vh_value_G3, 
@@ -180,7 +191,7 @@ summary(fzmP_probit)
 results_model(fzmP_probit, m = 50, dev = F)
 
 
-### 6) Zero modifie P cloglog ----
+### 7) Zero modifie P cloglog ----
 fzmP_clolog <- hurdle(claim_nb ~ bonus+drv_age1+pol_coverage+pol_pay_freq+
                         pol_payd+risk_class_G+vh_age_G2+vh_fuel+
                         vh_make_G+vh_value_G3, 
@@ -190,7 +201,7 @@ summary(fzmP_clolog)
 results_model(fzmP_clolog, m = 50, dev = F)
 
 
-### 7) Zero modifie P cauchit ----
+### 8) Zero modifie P cauchit ----
 fzmP_cauchit <- hurdle(claim_nb ~ bonus+drv_age1+pol_coverage+pol_pay_freq+
                          pol_payd+risk_class_G+vh_age_G2+vh_fuel+
                          vh_make_G+vh_value_G3, 
@@ -200,7 +211,7 @@ summary(fzmP_cauchit)
 results_model(fzmP_cauchit, m = 50, dev = F)
 
 
-### 8) Zero modifie NB logit----
+### 9) Zero modifie NB logit----
 fzmNB_logit <- hurdle(claim_nb ~ bonus+drv_age1+pol_coverage+pol_pay_freq+
                         pol_payd+risk_class_G+vh_age_G2+vh_fuel+
                         vh_make_G+vh_value_G3, 
@@ -240,18 +251,18 @@ results_model(fgamma2, m = 50)
 saveRDS(fgamma2,"data/model_fgamma2_sev.rds")
 
 
-### 3) Modele Inverse gaussienne lien 1/mu^2 ---- 
+### 2) Modele Inverse gaussienne lien log ----
 fig_log <- glm(claim_amount ~ drv_age1+
                  pol_coverage+
                  pol_pay_freq+
                  vh_age_G2+
                  vh_value_G3,
-               family=inverse.gaussian("1/mu^2"), data=data_claims_ecrete_year0, maxit = 50)
+               family=inverse.gaussian("log"), data=data_claims_ecrete_year0, maxit = 50)
 summary(fig_log)
 results_model(fig_log, m = 1, trim = F)
-#ni log ni 1/muê ne fonctionne
 
-### 4) Modele Log Normal ----
+
+### 3) Modele Log Normal ----
 flnorm <- lm(log(claim_amount) ~ drv_age1+
                  pol_coverage+
                  pol_pay_freq+
@@ -288,31 +299,30 @@ saveRDS(fgamma2_e,"data/model_fgamma2_sev_e.rds")
 #drv_age2 vh_cyl pol_payd densite vh_fuel
 
 
-### 2) Modele log Gamma ----
-f_loggamma_e <- glm(log_claim_amount_ecrete ~ drv_age1+
-                 pol_coverage+
-                 pol_pay_freq+
-                 vh_age_G2+
-                 vh_value_G3,
-               family=Gamma("identity"), data=data_claims_ecrete_year0)
-summary(f_loggamma_e)
-results_model(f_loggamma_e, m = 1, trim = F)
-
-
-### 3) Modele Inverse gaussienne lien log ----
+### 2) Modele Inverse gaussienne lien log ----
 fig_log_e <- glm(claim_amount_ecrete ~ drv_age1+
                  pol_coverage+
                  pol_pay_freq+
                  vh_age_G2+
                  vh_value_G3,
-               family=inverse.gaussian("1/mu^2"), data=data_claims_ecrete_year0, maxit = 50)
+               family=inverse.gaussian("log"), data=data_claims_ecrete_year0, maxit = 50)
 summary(fig_log_e)
 results_model(fig_log_e, m = 1, trim = F)
 
 #on elimine 
 #drv_age2, bonus,vh_cyl,densite,pol_payd,vh_make_G,risk_class_G,vh_fuel
 
- 
+### 3) Modele Inverse gaussienne lien log ----
+fig_mu_e <- glm(claim_amount_ecrete ~ drv_age1+
+                   pol_coverage+
+                   pol_pay_freq+
+                   vh_age_G2+
+                   vh_value_G3,
+                 family=inverse.gaussian("1/mu^2"), data=data_claims_ecrete_year0, maxit = 50)
+summary(fig_mu_e)
+results_model(fig_mu_e, m = 1, trim = F)
+
+
 ### 4) Modele Log Normal ----
 flnorm_e <- lm(log(claim_amount_ecrete) ~ drv_age1+
                    pol_coverage+
@@ -356,19 +366,34 @@ fgamma_s <- glm(claim_amount ~ #bonus+
                 family=Gamma("log"), data=data_claim_attritionel)
 summary(fgamma_s)
 results_model(fgamma_s)
-saveRDS(fgamma_s, "data/fgamma_separe.rds")
+xtable(summary(fgamma_s))
+pred_group(model = fgamma_s, data= data_claim_attritionel, "claim_amount", "drv_age1")
+pred_group(model = fgamma_s, data= data_claim_attritionel, "claim_amount", "pol_coverage")
+pred_group(model = fgamma_s, data= data_claim_attritionel, "claim_amount", "pol_pay_freq")
+pred_group(model = fgamma_s, data= data_claim_attritionel, "claim_amount", "vh_age_G2")
+pred_group(model = fgamma_s, data= data_claim_attritionel, "claim_amount", "vh_value_G3")
+
 
 ### 2) Modele Inverse Gaussienne lien Log----
+figl_s <- glm(claim_amount ~ drv_age1+
+               pol_coverage+
+               pol_pay_freq+
+               vh_age_G2+
+               vh_value_G3,
+             family=inverse.gaussian("log"), data=data_claim_attritionel)
+results_model(figl_s)
+
+### 3) Modele Inverse Gaussienne lien 1/mu2----
 fig_s <- glm(claim_amount ~ drv_age1+
                   pol_coverage+
                   pol_pay_freq+
                   vh_age_G2+
                   vh_value_G3,
-                family=inverse.gaussian("log"), data=data_claim_attritionel)
+                family=inverse.gaussian("1/mu^2"), data=data_claim_attritionel)
 results_model(fig_s)
 
 
-### 3) Modele Log Normal----
+### 4) Modele Log Normal----
 fLN_s <- lm(log(claim_amount) ~ drv_age1+
                pol_coverage+
                pol_pay_freq+

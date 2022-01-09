@@ -40,31 +40,29 @@ fun_plot <- function(data,var1,var2){
 
 
 
-fun_boxplot <- function(data, var1, var2){
+fun_boxplot <- function(data, var1, var2, both = T){
   data_plot <- data %>% rename(y = eval(var2))
   m = quantile(data_plot$y, 0.9)
 
   p1 <- plot_ly(data = data, color = "grey25", showlegend = F) %>% 
-    add_trace(x = as.formula(paste0("~","as.factor(", var1,")")),
+    add_boxplot(x = as.formula(paste0("~","as.factor(", var1,")")),
               y = as.formula(paste0("~", var2)), 
-              type = "box",
-              colors = "grey") %>%
-    layout(boxmode = "group",
-           xaxis = list(title = var1),
+              colors = "grey",
+              boxmean = T) %>%
+    layout(xaxis = list(title = var1),
            yaxis = list(title = var2, range = c(0, 0.8*m)),
            title = paste0(var2," by ", var1))
   
   p2 <- plot_ly(data = data, color = "grey25", showlegend = F) %>% 
-    add_trace(x = as.formula(paste0("~","as.factor(", var1,")")),
+    add_boxplot(x = as.formula(paste0("~","as.factor(", var1,")")),
               y = as.formula(paste0("~", var2)), 
-              type = "box",
               colors = "grey") %>%
-    layout(boxmode = "group",
-           xaxis = list(title = var1),
+    layout(xaxis = list(title = var1),
            yaxis = list(title = var2),
            title = paste0(var2," by ", var1))
   
-    subplot(p1, p2, nrows = 1, margin = 0.05)
+  if (both){subplot(p1, p2, nrows = 1, margin = 0.05)}
+  else{p1}
 }
 #fun_boxplot(freMTPL_filtered, "DriverAge", "ClaimAmount")
 
@@ -209,7 +207,7 @@ pred_group <- function(data, model, var_nb, var_group){
     add_trace(x = ~group, y = ~n, type = "bar", color = 'grey90', name = "") %>%
     add_trace(x = ~group, y = ~obs_freq, type = "scatter", mode = "markers", yaxis = "y2",color = 'grey25', name = "obs.freq") %>%
     add_trace(x = ~group, y = ~avg_pred_freq, type = "scatter", mode = "markers", yaxis = "y2",color = 'orange', name = "avg pred.freq") %>%
-    layout(yaxis2 = list(overlaying = "y", side = "right"),
+    layout(yaxis2 = list(overlaying = "y", side = "right", showgrid = FALSE),
            xaxis = list(title = var_group))
 }
 
@@ -218,7 +216,7 @@ pred_group <- function(data, model, var_nb, var_group){
 
 
 
-results_model2 <- function(model, m=100, trim = T, plot_res = T, dev = T){
+results_model <- function(model, m=100, trim = T, plot_res = T, dev = T){
   print(paste("log-vraisemblance =", round(logLik(model),2) ))
   print(paste("AIC =", round(AIC(model),2) ))
   print(paste("BIC =", round(BIC(model),2) ))
@@ -230,18 +228,3 @@ results_model2 <- function(model, m=100, trim = T, plot_res = T, dev = T){
     plotgroupresiduals(model, m= m, trim = trim)
   }
 }
-
-
-results_model <- function(model, m=100, trim = T, plot_res = T, dev = T){
-  print(as.numeric(round(logLik(model),2)))
-  print(round(AIC(model),2)) 
-  print(round(BIC(model),2)) 
-  if (dev){
-    print(round(model$deviance,2) )
-    print( round(model$null.deviance - model$deviance,2) )
-  }
-  if (plot_res){
-    plotgroupresiduals(model, m= m, trim = trim)
-  }
-}
-
